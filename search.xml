@@ -1,29 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello World</title>
-    <url>/2021/08/09/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+    <title>枚举单例</title>
+    <url>/2020/08/21/singleton/</url>
+    <content><![CDATA[<p>单例模式是应用最广泛的模式之一。在应用这个模式时，单例对象的类必须保证只有一个实例存在。</p>
 <span id="more"></span>
 
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="bash">$ hexo new &quot;My New Post&quot;
+<p>实现单例模式主要有以下几个关键点：<br>1.构造函数一般不对外开放，一般为private；<br>2.通过一个静态方法或者枚举返回单例类对象；<br>3.确保单例类的对象有且只有一个，尤其是在多线程环境下；<br>4.确保单例类对象在反序列化时不会重新构建对象。</p>
+<h2 id="常见的单例实现方式"><a href="#常见的单例实现方式" class="headerlink" title="常见的单例实现方式"></a>常见的单例实现方式</h2><p>常见的单例实现方式有懒汉模式、DCL、静态内部类单例模式。上述的几种单例模式实现中，在反序列化的情况下它们会出现重建对象。</p>
+<p>我们知道通过序列化可以将一个单例的对象的实例对象写到磁盘，然后再读回来，从而有效地获得一个实例。即使构造函数是私有的，反序列化时依然可以通过特殊的途径去创建类的一个新的实例，相当于调用该类的构造函数。反序列化提供了一个很特别的钩子函数，类中具有一个私有的<code>readResolve()</code>函数，这个函数可以让开发人员控制对象的反序列化。如果想杜绝单例对象在被反序列化时重新生成对象，那么必须加入<code>readResolve</code>函数。</p>
+<pre><code>public final class Singleton implements Serializable &#123;
+    private static final long serialVersionUID = 0L；
+    private static final Singleton INSTANCE = new Singleton();
+
+    private Singleton() &#123;
+    &#125;
+
+    public static Singleton getInstance() &#123;
+        return INSTANCE;
+    &#125;
+
+    private Object readResolve() throws ObjectStreamException &#123;
+        return INSTANCE;
+    &#125;
+&#125;
 </code></pre>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="bash">$ hexo server
+<p>而对于枚举单例，不仅写法简单，最重要的是默认枚举实例的创建是线程安全的，并且在任何情况下他都是一个单例。<br>《Effective Java》在谈到枚举单例中写到：这种方法在功能上与公有域方法相近，但是它更加简洁，无偿提供了序列化机制，绝对防止多次实例化，即使是在面对复杂序列化或者反射攻击的时候。虽然这种方法还没有广泛采用，但是单元素的枚举类型已经成为实现Singleton的最佳方法。</p>
+<h3 id="枚举单例"><a href="#枚举单例" class="headerlink" title="枚举单例"></a>枚举单例</h3><p>枚举单例实现方式如下</p>
+<pre><code>public enum SingletonEnum &#123;
+    INSTANCE;
+    public void doSomething() &#123;
+
+    &#125;
+&#125;
 </code></pre>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre><code class="bash">$ hexo generate
-</code></pre>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre><code class="bash">$ hexo deploy
-</code></pre>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p>那么枚举单例是怎样保证线程安全的呢？</p>
+<p>我们查看SingletonEnum.java文件编译后的字节码文件。如下：</p>
+<p><img src="singleton.png" alt="alt"></p>
+<p>可以看出，编译之后会生成一个继承自<code>java.lang.Enum</code>的<code>final class</code> SingletonEnum类，申明的枚举实例对应一个用<code>static final</code>修饰的变量，其初始化在静态块中完成。所以本质上线程安全也是通过类加载过程中，类构造器的调用实现了同步。</p>
+<p>又是如何保证反射安全呢？继续看代码</p>
+<p><img src="singleton1.png" alt="alt"></p>
+<p>原来在<code>java.lang.reflect.Constructor</code>类的<code>newInstance()</code>方法中进行了类型判断。如果是Enum类型，则会直接抛出异常。</p>
+<p>那么，序列化安全又是如何保证的呢？<br>通过阅读<code>ObjectOutputStream</code>类的<code>writeEnum()</code>方法和<code>ObjectInputStream</code>的<code>readEnum()</code>方法可知，序列化时，当为<code>Enum</code>类型时，只会把<code>Enum</code>类型中定义的<code>name</code><br>属性输出到结果中。反序列化时，就调用<code>Enum</code>的<code>T valueOf(Class&lt;T&gt; enumType, String name)</code>方法，根据<code>name</code>拿到Enum实例。</p>
+<p>同时，编译器是不允许任何对这种序列化进行定制，因此禁用了<code>writeObject、readObject、readObjectNoData</code>方法。并且<code>Enum</code>私有化了构造函数，且禁用了<code>clone()</code>方法，防止通过<code>new</code>和克隆创造对象。</p>
 ]]></content>
       <categories>
-        <category>随笔</category>
+        <category>设计模式</category>
       </categories>
       <tags>
-        <tag>hexo</tag>
+        <tag>单例</tag>
       </tags>
   </entry>
 </search>
