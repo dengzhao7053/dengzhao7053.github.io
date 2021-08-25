@@ -22,16 +22,21 @@
     var CONFIG = {"hostname":"dengzhao7053.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Levi&#39;s Blog">
-<meta property="og:url" content="https://dengzhao7053.github.io/archives/2020/index.html">
+  <meta name="description" content="Java Memory Model">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java内存模型">
+<meta property="og:url" content="https://dengzhao7053.github.io/2020/04/01/jmm/index.html">
 <meta property="og:site_name" content="Levi&#39;s Blog">
-<meta property="og:description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
+<meta property="og:description" content="Java Memory Model">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://dengzhao7053.github.io/2020/04/01/jmm/jmm.png">
+<meta property="article:published_time" content="2020-04-01T07:00:22.000Z">
+<meta property="article:modified_time" content="2021-08-25T14:59:07.906Z">
+<meta property="article:tag" content="JMM">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dengzhao7053.github.io/2020/04/01/jmm/jmm.png">
 
-<link rel="canonical" href="https://dengzhao7053.github.io/archives/2020/">
+<link rel="canonical" href="https://dengzhao7053.github.io/2020/04/01/jmm/">
 
 
 <script id="page-configurations">
@@ -39,12 +44,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Levi's Blog</title>
+  <title>Java内存模型 | Levi's Blog</title>
   
 
 
@@ -180,236 +185,149 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dengzhao7053.github.io/2020/04/01/jmm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Levi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java内存模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-01 15:00:22" itemprop="dateCreated datePublished" datetime="2020-04-01T15:00:22+08:00">2020-04-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
   
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 11 篇日志。 继续努力。</span>
-      </div>
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/01/jmm/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/01/jmm/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2020</span>
-    </div>
+        <p><code>Java Memory Model</code></p>
+<span id="more"></span>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-08-21T00:57:40+08:00"
-              content="2020-08-21">
-          08-21
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/08/21/singleton/" itemprop="url">
-            <span itemprop="name">枚举单例</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-18T14:51:33+08:00"
-              content="2020-04-18">
-          04-18
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/18/collectors/" itemprop="url">
-            <span itemprop="name">经典垃圾收集器</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-17T15:41:42+08:00"
-              content="2020-04-17">
-          04-17
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/17/gc-method/" itemprop="url">
-            <span itemprop="name">垃圾收集算法</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-16T15:33:38+08:00"
-              content="2020-04-16">
-          04-16
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/16/gc-obj-decision-method/" itemprop="url">
-            <span itemprop="name">GC对象的判定方法</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-15T15:48:00+08:00"
-              content="2020-04-15">
-          04-15
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/15/classload2/" itemprop="url">
-            <span itemprop="name">类加载器的双亲委派模型</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-14T04:45:19+08:00"
-              content="2020-04-14">
-          04-14
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/14/classload/" itemprop="url">
-            <span itemprop="name">类加载过程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-02T15:16:12+08:00"
-              content="2020-04-02">
-          04-02
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/02/memory/" itemprop="url">
-            <span itemprop="name">Java内存区域</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-01T15:00:22+08:00"
-              content="2020-04-01">
-          04-01
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/01/jmm/" itemprop="url">
-            <span itemprop="name">Java内存模型</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-30T03:51:37+08:00"
-              content="2020-03-30">
-          03-30
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/30/createobj/" itemprop="url">
-            <span itemprop="name">对象的创建</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T15:37:40+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/object/" itemprop="url">
-            <span itemprop="name">对象的内存结构</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+<p><code>Java</code>虚拟机规范中定义了<code>Java</code>内存模型<code>(Java Memory Model，JMM)</code>，用于屏蔽掉各种硬件和操作系统的内存访问差异，以实现让<code>Java</code>程序在各种平台下都能达到一致的并发效果。</p>
+<p><code>Java</code>内存模型规定了所有的变量都存储在主内存中(此处的主内存与介绍物理硬件时提到的主内存名字一样，两者也可以类比，但物理上它仅仅是虚拟机内存的一部分)。每条线程还有自己的工作内存(可与前面讲的处理器高速缓存类比)，线程的工作内存中保存该线程使用的变量的主内存副本，线程对变量的所有操作(读取、赋值等)都必须在工作内存中进行，而不能直接读写主内存中的数据。不同的线程之间也无法直接访问对方工作内存的变量，线程间变量值的传递均需要通过主内存来完成，线程、主内存、工作内存三者的交互关系如图：<br><img src="jmm.png" alt="关系"><br>这里所讲的主内存、工作内存与<code>Java</code>内存区域中的<code>Java</code>堆、栈、方法区等并不是同一个层次的堆内存的划分，这两者基本上是没有任何关系的。如果两者一定要勉强对应起来，那么从变量、主内存、工作内存的定义来看，主内存主要对应于<code>Java</code>堆中的对象实例数据部分，而工作内存则对应于虚拟机栈中的部分区域。从更基础的层次上说，主内存直接对应于物理硬件内存，而为了获取更好的运行速度，虚拟机(或者是硬件、操作系统本身的优化措施)可能会让工作内存优先存储于寄存器和高速缓存中，因为程序运行时主要访问的是工作内存。</p>
+<h3 id="内存间交互操作"><a href="#内存间交互操作" class="headerlink" title="内存间交互操作"></a>内存间交互操作</h3><p>关于主内存与工作内存之间具体的交互协议，即一个变量如何从主内存拷贝到工作内存、如何从工作内存同步回主内存这一类的实现细节，<code>Java</code>内存模型中定义了以下8种操作来完成。<code>Java</code>虚拟机实现时必须保证下面提及的每一种操作都是原子的、不可再分的。</p>
+<ul>
+<li><code>lock</code>(锁定)：作用于主内存的变量，它把一个变量标识为一条线程独占的状态。</li>
+<li><code>unlock</code>(解锁)：作用于主内存的变量，他把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</li>
+<li><code>read</code>(读取)：作用于主内存的变量，它把一个变量的值从主内存传输到线程的工作内存中，以便随后的<code>load</code>动作使用。</li>
+<li><code>load</code>(载入)：作用于工作内存的变量，它把<code>read</code>操作从主内存中得到的变量值放入工作内存的变量副本中。</li>
+<li><code>use</code>(使用)：作用于工作内存的变量，它把工作内存中一个变量的值传递给执行引擎，每当虚拟机遇到一个需要使用变量的值的字节码指令时将会执行这个操作。</li>
+<li><code>assign</code>(赋值)：作用于工作内存的变量，它把一个从执行引擎接收的值赋给工作内存的变量，每当虚拟机遇到一个给变量赋值的字节码指令是执行这个操作。</li>
+<li><code>store</code>(存储)：作用于工作内存的变量，它把工作内存中一个变量的值传送到主内存中，以便随后的<code>write</code>操作使用。</li>
+<li><code>write</code>(写入)：作用于主内存的变量，它把<code>store</code>操作从工作内存中得到的变量的值放入主内存的变量中。</li>
+</ul>
+<p>如果要把一个变量从主内存拷贝到工作内存，那就要按顺序执行<code>read</code>和<code>load</code>操作，如果要把变量从工作内存同步回主内存，就要按顺序执行<code>store</code>和<code>write</code>操作。注意，<code>Java</code>内存模型只要求上述两个操作必须按顺序执行，但不要求是连续执行。也就是说<code>read</code>和<code>load</code>之间、<code>store</code>与<code>write</code>之间是可以插入其他指令的。</p>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JMM/" rel="tag"># JMM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/30/createobj/" rel="prev" title="对象的创建">
+      <i class="fa fa-chevron-left"></i> 对象的创建
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/02/memory/" rel="next" title="Java内存区域">
+      Java内存区域 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -456,6 +374,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E9%97%B4%E4%BA%A4%E4%BA%92%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">内存间交互操作</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

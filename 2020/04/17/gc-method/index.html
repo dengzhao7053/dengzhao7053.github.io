@@ -22,22 +22,19 @@
     var CONFIG = {"hostname":"dengzhao7053.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="单例模式是应用最广泛的模式之一。在应用这个模式时，单例对象的类必须保证只有一个实例存在。">
+  <meta name="description" content="本文介绍常见的垃圾收集算法。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="枚举单例">
-<meta property="og:url" content="https://dengzhao7053.github.io/2020/08/21/singleton/index.html">
+<meta property="og:title" content="垃圾收集算法">
+<meta property="og:url" content="https://dengzhao7053.github.io/2020/04/17/gc-method/index.html">
 <meta property="og:site_name" content="Levi&#39;s Blog">
-<meta property="og:description" content="单例模式是应用最广泛的模式之一。在应用这个模式时，单例对象的类必须保证只有一个实例存在。">
+<meta property="og:description" content="本文介绍常见的垃圾收集算法。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dengzhao7053.github.io/2020/08/21/singleton/singleton.png">
-<meta property="og:image" content="https://dengzhao7053.github.io/2020/08/21/singleton/singleton1.png">
-<meta property="article:published_time" content="2020-08-20T16:57:40.000Z">
-<meta property="article:modified_time" content="2021-08-25T14:59:38.997Z">
-<meta property="article:tag" content="单例">
+<meta property="article:published_time" content="2020-04-17T07:41:42.000Z">
+<meta property="article:modified_time" content="2021-08-25T14:58:55.236Z">
+<meta property="article:tag" content="GC">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dengzhao7053.github.io/2020/08/21/singleton/singleton.png">
 
-<link rel="canonical" href="https://dengzhao7053.github.io/2020/08/21/singleton/">
+<link rel="canonical" href="https://dengzhao7053.github.io/2020/04/17/gc-method/">
 
 
 <script id="page-configurations">
@@ -50,7 +47,7 @@
   };
 </script>
 
-  <title>枚举单例 | Levi's Blog</title>
+  <title>垃圾收集算法 | Levi's Blog</title>
   
 
 
@@ -193,7 +190,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dengzhao7053.github.io/2020/08/21/singleton/">
+    <link itemprop="mainEntityOfPage" href="https://dengzhao7053.github.io/2020/04/17/gc-method/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -206,7 +203,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          枚举单例
+          垃圾收集算法
         </h1>
 
         <div class="post-meta">
@@ -216,7 +213,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-08-21 00:57:40" itemprop="dateCreated datePublished" datetime="2020-08-21T00:57:40+08:00">2020-08-21</time>
+              <time title="创建时间：2020-04-17 15:41:42" itemprop="dateCreated datePublished" datetime="2020-04-17T15:41:42+08:00">2020-04-17</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -224,7 +221,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
                 </span>
             </span>
 
@@ -244,8 +241,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/2020/08/21/singleton/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/21/singleton/" itemprop="commentCount"></span>
+    <a title="valine" href="/2020/04/17/gc-method/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/17/gc-method/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -255,14 +252,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
+              <span>2.7k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -274,46 +271,31 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>单例模式是应用最广泛的模式之一。在应用这个模式时，单例对象的类必须保证只有一个实例存在。</p>
+        <p>本文介绍常见的垃圾收集算法。</p>
 <span id="more"></span>
 
-<p>实现单例模式主要有以下几个关键点：<br>1.构造函数一般不对外开放，一般为private；<br>2.通过一个静态方法或者枚举返回单例类对象；<br>3.确保单例类的对象有且只有一个，尤其是在多线程环境下；<br>4.确保单例类对象在反序列化时不会重新构建对象。</p>
-<h2 id="常见的单例实现方式"><a href="#常见的单例实现方式" class="headerlink" title="常见的单例实现方式"></a>常见的单例实现方式</h2><p>常见的单例实现方式有懒汉模式、DCL、静态内部类单例模式。上述的几种单例模式实现中，在反序列化的情况下它们会出现重建对象。</p>
-<p>我们知道通过序列化可以将一个单例的对象的实例对象写到磁盘，然后再读回来，从而有效地获得一个实例。即使构造函数是私有的，反序列化时依然可以通过特殊的途径去创建类的一个新的实例，相当于调用该类的构造函数。反序列化提供了一个很特别的钩子函数，类中具有一个私有的<code>readResolve()</code>函数，这个函数可以让开发人员控制对象的反序列化。如果想杜绝单例对象在被反序列化时重新生成对象，那么必须加入<code>readResolve</code>函数。</p>
-<pre><code>public final class Singleton implements Serializable &#123;
-    private static final long serialVersionUID = 0L；
-    private static final Singleton INSTANCE = new Singleton();
-
-    private Singleton() &#123;
-    &#125;
-
-    public static Singleton getInstance() &#123;
-        return INSTANCE;
-    &#125;
-
-    private Object readResolve() throws ObjectStreamException &#123;
-        return INSTANCE;
-    &#125;
-&#125;
-</code></pre>
-<p>而对于枚举单例，不仅写法简单，最重要的是默认枚举实例的创建是线程安全的，并且在任何情况下他都是一个单例。<br>《Effective Java》在谈到枚举单例中写到：这种方法在功能上与公有域方法相近，但是它更加简洁，无偿提供了序列化机制，绝对防止多次实例化，即使是在面对复杂序列化或者反射攻击的时候。虽然这种方法还没有广泛采用，但是单元素的枚举类型已经成为实现Singleton的最佳方法。</p>
-<h3 id="枚举单例"><a href="#枚举单例" class="headerlink" title="枚举单例"></a>枚举单例</h3><p>枚举单例实现方式如下</p>
-<pre><code>public enum SingletonEnum &#123;
-    INSTANCE;
-    public void doSomething() &#123;
-
-    &#125;
-&#125;
-</code></pre>
-<p>那么枚举单例是怎样保证线程安全的呢？</p>
-<p>我们查看SingletonEnum.java文件编译后的字节码文件。如下：</p>
-<p><img src="singleton.png" alt="alt"></p>
-<p>可以看出，编译之后会生成一个继承自<code>java.lang.Enum</code>的<code>final class</code> SingletonEnum类，申明的枚举实例对应一个用<code>static final</code>修饰的变量，其初始化在静态块中完成。所以本质上线程安全也是通过类加载过程中，类构造器的调用实现了同步。</p>
-<p>又是如何保证反射安全呢？继续看代码</p>
-<p><img src="singleton1.png" alt="alt"></p>
-<p>原来在<code>java.lang.reflect.Constructor</code>类的<code>newInstance()</code>方法中进行了类型判断。如果是Enum类型，则会直接抛出异常。</p>
-<p>那么，序列化安全又是如何保证的呢？<br>通过阅读<code>ObjectOutputStream</code>类的<code>writeEnum()</code>方法和<code>ObjectInputStream</code>的<code>readEnum()</code>方法可知，序列化时，当为<code>Enum</code>类型时，只会把<code>Enum</code>类型中定义的<code>name</code><br>属性输出到结果中。反序列化时，就调用<code>Enum</code>的<code>T valueOf(Class&lt;T&gt; enumType, String name)</code>方法，根据<code>name</code>拿到Enum实例。</p>
-<p>同时，编译器是不允许任何对这种序列化进行定制，因此禁用了<code>writeObject、readObject、readObjectNoData</code>方法。并且<code>Enum</code>私有化了构造函数，且禁用了<code>clone()</code>方法，防止通过<code>new</code>和克隆创造对象。</p>
+<h3 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h3><p>最早出现也是最基础的垃圾收集算法是“标记-清除”算法。如它的名字一样，算法分为“标记”和“清除”两个阶段：首先标记出所有需要回收的对象，在标记完成后，统一回收掉所有被标记的对象，也可以反过来，标记存活的对象，统一回收所有未标记的对象。标记过程就是对象是否属于垃圾的判定过程。</p>
+<p>之所以说它是最基础的收集算法，是因为后续的收集算法大多都是以标记-清除算法为基础，对其缺点进行改进而得到的。它的主要缺点有两个：第一个是执行效率不稳定，如果<code>Java</code>堆中包含大量对象，而且其中大部分是需要被回收的，这时必须进行大量标记和清除的动作，导致标记和清除两个过程的执行效率都随对象数量增长而降低；第二个是内存空间的碎片化问题，标记、清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致当以后在程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</p>
+<h3 id="标记-复制算法"><a href="#标记-复制算法" class="headerlink" title="标记-复制算法"></a>标记-复制算法</h3><p>标记-复制算法常被简称为复制算法。它将可用内存按照容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另一块上面，然后再把已使用过的内存空间一次清理掉。如果内存中多数对象都是存活的，这种算法将会产生大量的内存间复制的开销，但对于多数对象都是可回收的情况，算法需要复制的就是占少数的存活对象，而且每次都是针对整个半区进行内存回收，分配内存时也就不用考虑有空间碎片的复杂情况，只要移动堆顶指针，按顺序分配即可。这样实现简单，运行高效，不过其缺陷也显而易见，这种复制回收算法的代价是将可用内存缩小为了原来的一半，空间浪费未免太多了一点。</p>
+<h3 id="标记-整理算法"><a href="#标记-整理算法" class="headerlink" title="标记-整理算法"></a>标记-整理算法</h3><p>标记复制算法在对象存活率较高时就要进行较多的复制操作，效率将会降低。更关键的是，若果不想浪费50%的空间，就需要有额外的空间进行分配担保，以应对被使用的内存中所有对象都100%存活的极端情况，所以老年代一般不能直接选用这种算法。</p>
+<p>针对老年代对象的存亡特征，提出了另一种有针对性的“标记-整理”算法，其中的标记过程仍然与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活对象都向内存空间一端移动，然后直接清理掉边界以外的内存。</p>
+<p>标记-清除算法与标记-整理算法的本质差异在于前者是一种非移动式的回收算法，而后者是移动式的。是否移动回收后的存活对象是一项优缺点并存的风险决策：</p>
+<p>如果移动存活对象，尤其是在老年代这种每次回收都有大量对象存活区域，移动存活对象并更新所有引用这些对象的地方将会是一种极为负重的操作，而且这种对象移动操作必须全部暂停用户应用程序才能进行，这就更加让使用者不得不小心翼翼地权衡其弊端了，像这样的停顿被最初的虚拟机设计者形象的描述为<code>“Stop The World”</code>。</p>
+<p>但如果跟标记-清除算法那样完全不考虑移动和整理存活对象的话，弥散与堆中的存活对象导致的空间碎片化问题就只能依赖更为复杂的内存分配器和内存访问器来解决。内存的访问是用户程序最频繁的操作，甚至没有之一，假如在这个环节上增加了额外的负担，势必会直接影响应用程序的吞吐量。</p>
+<h3 id="分代收集理论"><a href="#分代收集理论" class="headerlink" title="分代收集理论"></a>分代收集理论</h3><p>当前商业虚拟机的垃圾收集器，大多数都遵循了“分代收集”的理论进行设计，分代收集名为理论，实质是一套符合大多数程序运行实际情况的经验法则，它建立在两个分代假说之上：</p>
+<ol>
+<li>弱分代假说：绝大多数对象都是朝生夕灭的</li>
+<li>强分代假说：熬过越多次垃圾收集过程的对象就越难以消亡</li>
+</ol>
+<p>这两个分代假说共同奠定了多款常用的垃圾收集器的一致的设计原则：收集器应该将<code>Java</code>堆划分出不同的区域，然后将回收对象依据其年龄(年龄即对象熬过垃圾收集过程的次数)分配到不同的区域之中存储。显而易见，如果一个区域中大多数对象都是朝生夕灭，难以熬过垃圾收集过程的话，那么把它们集中放在一起，每次回收时只关注如何保留少量存活而不是去标记那些大量将要被回收的对象，就能以较低代价回收到大量的空间；如果剩下的都是难以消亡的对象，那把他们集中放在一块，虚拟机便可以使用较低的频率来回收这个区域，这就同时兼顾了垃圾收集的时间开销和内存的空间有效利用。</p>
+<p>在<code>Java</code>堆划分出不同的区域之后，垃圾收集器才可以每次只回收其中一个或者某部分的区域——因而才有了<code>“Minor GC”“Major GC”“Full GC”</code>这样的回收类型的划分；也才能够针对不同的区域安排与里面存储对象存亡特征相匹配的垃圾收集算法——因而发展出了“标记复制算法”“标记清除算法”“标记整理算法”等针对性的垃圾收集算法。</p>
+<p>把分代收集理论具体放到现在的商用<code>Java</code>虚拟机里，设计者一般至少会把<code>Java</code>堆划分为新生代<code>(Young Generation)</code>和老年代<code>(Old Generation)</code>两个区域。顾名思义，在新生代中，每次垃圾收集时都发现有大批对象死去，而每次回收后存活的少量对象，将会逐步晋升到老年代中存放。</p>
+<p>其实我们只要仔细思考一下，也很容易发现分代收集并非只是简单划分一下内存区域那么容易，它至少存在一个明显的困难：对象不是孤立的，对象之间会存在跨代引用。假如要现在进行一次只局限于新生代区域内的收集<code>(Minor GC)</code>，但新生代中的对象是完全有可能被老年代所引用，为了找出该区域中的存活对象，不得不在固定的<code>GC Roots</code>之外，再额外遍历整个老年代中所有对象来确保可达性分析结果的正确性。遍历整个老年代所有对象的方案虽然理论上可行，但无疑会为内存回收带来很大的性能负担。为了解决这个问题，就需要对分代收集理论添加第三条经验法则：</p>
+<ol start="3">
+<li>跨代引用假说：跨代引用相对于同代引用来说仅占极少数</li>
+</ol>
+<p>这其实是可根据前两条假说逻辑推理得出的隐含推论：存在相互引用关系的两个对象，是应该倾向于同时生存或者同时消亡的。举个例子，如果某个新生代对象存在跨代引用，由于老年代对象难以消亡，该引用会使得新生代对象在收集时同样得以存活，进而在年龄增长之后晋升到老年代中，这时跨代引用也随即被消除了。</p>
+<p>依据这条假说，我们就不应再为了少数的跨代引用去扫描整个老年代，也不必浪费空间专门记录每一个对象是否存在及存在哪些跨代引用，只需在新生代上建立一个全局的数据结构(该结构被称为“记忆集”)，这个结构把老年代划分成若干小块，标记出老年代的哪一块内存会存在跨代引用。此后发生<code>Minor GC</code>时，只有包含了跨代引用的小块内存里的对象才会被加入到<code>GC Roots</code>进行扫描。虽然这种方法需要在对象改变引用关系时维护记录数据的正确性，会增加一些运行时的开销，但比起收集时扫描整个老年代来说任然是划算的。</p>
 
     </div>
 
@@ -323,7 +305,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%8D%95%E4%BE%8B/" rel="tag"># 单例</a>
+              <a href="/tags/GC/" rel="tag"># GC</a>
           </div>
 
         
@@ -332,12 +314,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/04/18/collectors/" rel="prev" title="经典垃圾收集器">
-      <i class="fa fa-chevron-left"></i> 经典垃圾收集器
+    <a href="/2020/04/16/gc-obj-decision-method/" rel="prev" title="GC对象的判定方法">
+      <i class="fa fa-chevron-left"></i> GC对象的判定方法
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/01/02/kotlinclass/" rel="next" title="Kotlin为什么将class设计成final类型">
-      Kotlin为什么将class设计成final类型 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/04/18/collectors/" rel="next" title="经典垃圾收集器">
+      经典垃圾收集器 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -398,7 +380,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E5%8D%95%E4%BE%8B%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">常见的单例实现方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE%E5%8D%95%E4%BE%8B"><span class="nav-number">1.1.</span> <span class="nav-text">枚举单例</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">标记-清除算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">标记-复制算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">标记-整理算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%E7%90%86%E8%AE%BA"><span class="nav-number">4.</span> <span class="nav-text">分代收集理论</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
