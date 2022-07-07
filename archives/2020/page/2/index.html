@@ -22,19 +22,16 @@
     var CONFIG = {"hostname":"dengzhao7053.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Java是一门面向对象的编程语言，Java程序运行过程中无时无刻都有对象被创建出来。在语言层面上，创建对象通常（例外：复制、反序列化）仅仅是一个new关键字而已，而在虚拟机中，普通Java对象的创建又是怎样一个过程呢？">
-<meta property="og:type" content="article">
-<meta property="og:title" content="对象的创建">
-<meta property="og:url" content="https://dengzhao7053.github.io/2020/03/30/createobj/index.html">
+  <meta name="description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Levi&#39;s Blog">
+<meta property="og:url" content="https://dengzhao7053.github.io/archives/2020/page/2/index.html">
 <meta property="og:site_name" content="Levi&#39;s Blog">
-<meta property="og:description" content="Java是一门面向对象的编程语言，Java程序运行过程中无时无刻都有对象被创建出来。在语言层面上，创建对象通常（例外：复制、反序列化）仅仅是一个new关键字而已，而在虚拟机中，普通Java对象的创建又是怎样一个过程呢？">
+<meta property="og:description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-03-29T19:51:37.000Z">
-<meta property="article:modified_time" content="2021-08-25T14:58:45.993Z">
-<meta property="article:tag" content="Java对象">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://dengzhao7053.github.io/2020/03/30/createobj/">
+<link rel="canonical" href="https://dengzhao7053.github.io/archives/2020/page/2/">
 
 
 <script id="page-configurations">
@@ -42,12 +39,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : true,
+    isPost : false,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>对象的创建 | Levi's Blog</title>
+  <title>归档 | Levi's Blog</title>
   
 
 
@@ -183,147 +180,59 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content archive">
             
 
-    
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dengzhao7053.github.io/2020/03/30/createobj/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Levi's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          对象的创建
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-30 03:51:37" itemprop="dateCreated datePublished" datetime="2020-03-30T03:51:37+08:00">2020-03-30</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span>
   
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/03/30/createobj/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/30/createobj/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+  <div class="post-block">
+    <div class="posts-collapse">
+      <div class="collection-title">
+        <span class="collection-header">嗯..! 目前共计 12 篇日志。 继续努力。</span>
+      </div>
 
       
-        <p><code>Java</code>是一门面向对象的编程语言，<code>Java</code>程序运行过程中无时无刻都有对象被创建出来。在语言层面上，创建对象通常（例外：复制、反序列化）仅仅是一个<code>new</code>关键字而已，而在虚拟机中，普通<code>Java</code>对象的创建又是怎样一个过程呢？</p>
-<span id="more"></span>
-
-<p><code>Java</code>对象的创建包含以下几步：</p>
-<h3 id="1-判断对象对应的类是否加载、链接和初始化"><a href="#1-判断对象对应的类是否加载、链接和初始化" class="headerlink" title="1.判断对象对应的类是否加载、链接和初始化"></a>1.判断对象对应的类是否加载、链接和初始化</h3><p>当<code>Java</code>虚拟机遇到一条字节码<code>new</code>指令时，首先先检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。这部分细节将在后续的文章中呈现。</p>
-<h3 id="2-为对象分配内存"><a href="#2-为对象分配内存" class="headerlink" title="2.为对象分配内存"></a>2.为对象分配内存</h3><p>在类加载检查通过后，接下来虚拟机将为新生对象分配内存。对象所需内存的大小在类加载完成后便可以完全确定，为对象分配空间的任务实际上便是等同于把一块确定大小的内存块从<code>Java</code>堆中划分出来。内存分配根据<code>Java</code>堆是否规整，有两种方式：</p>
-<p>①指针碰撞：如果<code>Java</code>堆的内存是规整的，即所有用过的内存放在一边，而空闲的内存放在另一边。分配内存时将位于中间的指针指示器向空闲的内存移动一段与对象大小相等的距离，这样便完成内存分配的工作</p>
-<p>②空闲列表：如果<code>Java</code>堆内存不是规整的，则需要由虚拟机维护一个列表来记录哪些内存是可用的，这样在分配的时候可以从列表中查询到足够大的内存分配给对象，并在分配后更新列表记录。</p>
-<p><code>Java</code>堆的内存分配是否规整根据所采用的垃圾收集器是否带有压缩整理功能有关。</p>
-<h3 id="3-处理并发问题"><a href="#3-处理并发问题" class="headerlink" title="3.处理并发问题"></a>3.处理并发问题</h3><p>除如何划分可用空间之外，还有另外一个需要考虑的问题：对象创建在虚拟机中是非常频繁的行为，即使仅仅修改一个指针所指向的位置，在并发情况下也并不是线程安全的，可能出现正在给对象A分配内存，指针还没来得及修改，对象B又同时使用了原来指针来分配内存的情况。解决这个问题有两种可选方案：</p>
-<p>①对分配内存空间的动作进行同步处理，比如在虚拟机采用<code>CAS</code>算法并配上失败重试的方式保证更新操作的原子性。</p>
-<p>②每个线程在<code>Java</code>堆中预先分配一小块内存，这块内存称为本地线程分配缓冲<code>(Thread Local Allocation Buffer, TLAB)</code>，线程需要分配内存时，就在对应线程的<code>TLAB</code>上分配内存，当线程中的<code>TLAB</code>用完并且被分配到了新的<code>TLAB</code>时，这时候才需要上述的同步锁定。</p>
-<h3 id="4-初始化零值"><a href="#4-初始化零值" class="headerlink" title="4.初始化零值"></a>4.初始化零值</h3><p>将分配到的内存，除了对象头外都初始化零值。这步操作保证了对象的实例字段在<code>Java</code>代码中可以不赋值就直接使用，使程序能访问到这些字段的数据类型所对应的零值。</p>
-<h3 id="5-设置对象头"><a href="#5-设置对象头" class="headerlink" title="5.设置对象头"></a>5.设置对象头</h3><p>将对象的所属类、对象的<code>hashcode</code>和对象的<code>GC</code>分代年龄等数据存储在对象的对象头中。</p>
-<h3 id="6-执行init方法进行初始化"><a href="#6-执行init方法进行初始化" class="headerlink" title="6.执行init方法进行初始化"></a>6.执行init方法进行初始化</h3><p>执行<code>init</code>方法，初始化对象的成员变量、调用类的构造方法，这样一个对象就被创建了出来。</p>
-
+    <div class="collection-year">
+      <span class="collection-header">2020</span>
     </div>
 
-    
-    
-    
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/Java%E5%AF%B9%E8%B1%A1/" rel="tag"># Java对象</a>
-          </div>
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2020-03-25T15:37:40+08:00"
+              content="2020-03-25">
+          03-25
+        </time>
+      </div>
 
-        
+      <div class="post-title">
+          <a class="post-title-link" href="/2020/03/25/object/" itemprop="url">
+            <span itemprop="name">对象的内存结构</span>
+          </a>
+      </div>
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/03/25/object/" rel="prev" title="对象的内存结构">
-      <i class="fa fa-chevron-left"></i> 对象的内存结构
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/04/01/jmm/" rel="next" title="Java内存模型">
-      Java内存模型 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
+    </header>
   </article>
+
+
+    </div>
+  </div>
   
   
   
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/archives/2020/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/archives/2020/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
           </div>
           
-    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -370,7 +279,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E5%AF%B9%E5%BA%94%E7%9A%84%E7%B1%BB%E6%98%AF%E5%90%A6%E5%8A%A0%E8%BD%BD%E3%80%81%E9%93%BE%E6%8E%A5%E5%92%8C%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">1.判断对象对应的类是否加载、链接和初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%B8%BA%E5%AF%B9%E8%B1%A1%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98"><span class="nav-number">2.</span> <span class="nav-text">2.为对象分配内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%A4%84%E7%90%86%E5%B9%B6%E5%8F%91%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">3.处理并发问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%88%9D%E5%A7%8B%E5%8C%96%E9%9B%B6%E5%80%BC"><span class="nav-number">4.</span> <span class="nav-text">4.初始化零值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E8%AE%BE%E7%BD%AE%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="nav-number">5.</span> <span class="nav-text">5.设置对象头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%89%A7%E8%A1%8Cinit%E6%96%B9%E6%B3%95%E8%BF%9B%E8%A1%8C%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">6.执行init方法进行初始化</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

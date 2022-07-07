@@ -1,6 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>注解</title>
+    <url>/2020/04/19/annotations/</url>
+    <content><![CDATA[<p>注解（也被称为元数据）为我们在代码中添加信息提供了一种形式化的方法，使我们可以在稍后某个时刻非常方便地使用这些数据。</p>
+<span id="more"></span>
+
+<p>注解是众多引入到Java SE5中的重要语言变化之一。他们可以提供用来完整地描述程序所需的信息，而这些信息是无法用Java来表达的。因此，注解使得我们能够以将由编译器来测试和验证的格式，存储有关程序的额外信息。注解可以用来生成描述符文件，甚至或是新的类定义，并且有助于减轻编写“样板”代码的负担。通过使用注解，我们可以将这些元数据保存在Java源代码中，并利用annotation API为自己的注解构造处理工具，同时，注解的优点还包括：更加干净易读的代码以及编译期类型检查等。虽然Java SE5预先定义了一些元数据，但一般来说，主要还是需要程序员自己添加新的注解，并按照自己的方式使用他们。</p>
+<h2 id="内置注解"><a href="#内置注解" class="headerlink" title="内置注解"></a>内置注解</h2><h3 id="标准注解"><a href="#标准注解" class="headerlink" title="标准注解"></a>标准注解</h3><p>Java SE5 内置了3种标准注解，定义在java.lang中：</p>
+<ul>
+<li><code>@Override</code>，表示当前的方法定义将覆盖超类中的方法。</li>
+<li><code>@Deprecated</code>，表示某一程序元素不建议使用了（过时了）。</li>
+<li><code>@SuppressWarnings</code>，用于关闭不当的编译器警告信息。</li>
+</ul>
+<h3 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h3><p>Java目前内置了四种元注解。元注解专职负责注解其他的注解：</p>
+<ul>
+<li><code>@Target</code>，表示该注解可以用于什么地方。可能的ElementType参数包括：<pre><code>      CONSTRUCTOR：构造器的声明
+      FIELD：域声明
+      LOCAL_VARIABLE：局部变量声明
+      METHOD：方法声明
+      PACKAGE：包声明
+      PARAMETER：参数声明
+      TYPE：类、接口或enum声明
+</code></pre>
+</li>
+<li><code>@Retention</code>，表示需要在什么级别保存该注解信息。可选的RetentionPolicy参数包括：<pre><code>      SUORCE：仅存在Java源文件，注解将被编译器丢弃。
+      CLASS：注解在class文件中可用，但会被VM丢弃。
+      RUNTIME：VM将在运行期也保留注解，因此可以通过反射机制读取注解的信息。
+</code></pre>
+</li>
+<li><code>@Documented</code>，将此注解包含在JavaDoc中。</li>
+<li><code>@Inherited</code>，允许子类继承父类中的注解——如果某个类使用了@Xxx注解（定义该Annotation时使用了@Inherited修饰）修饰，则其子类将自动被@Xxx修饰。</li>
+</ul>
+<h2 id="定义注解"><a href="#定义注解" class="headerlink" title="定义注解"></a>定义注解</h2><p>下边是创建的自定义注解，看起来很像接口的定义，事实上，与其它任何Java接口一样，注解也将会被编译成class文件。</p>
+<pre><code>@Target(ElementType.Method)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Test&#123;
+    public int id();
+    public String description() default &quot;no description&quot;;
+&#125;
+</code></pre>
+<p>在注解中，一般都会包含一些元素以表示某些值。当分析处理注解时，程序或工具可以利用这些值。注解的元素看起来就像接口的方法，唯一的区别是你可以为其指定默认值。没有元素的注解称为标记注解（marker annotation）。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>注解</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>类加载过程</title>
     <url>/2020/04/14/classload/</url>
     <content><![CDATA[<p>这篇文章我们来了解<code>Java</code>虚拟机中类加载的全过程，即加载、验证、准备、解析和初始化这五个阶段所执行的具体动作。</p>
@@ -107,6 +156,32 @@
       </tags>
   </entry>
   <entry>
+    <title>对象的创建</title>
+    <url>/2020/03/30/createobj/</url>
+    <content><![CDATA[<p><code>Java</code>是一门面向对象的编程语言，<code>Java</code>程序运行过程中无时无刻都有对象被创建出来。在语言层面上，创建对象通常（例外：复制、反序列化）仅仅是一个<code>new</code>关键字而已，而在虚拟机中，普通<code>Java</code>对象的创建又是怎样一个过程呢？</p>
+<span id="more"></span>
+
+<p><code>Java</code>对象的创建包含以下几步：</p>
+<h3 id="1-判断对象对应的类是否加载、链接和初始化"><a href="#1-判断对象对应的类是否加载、链接和初始化" class="headerlink" title="1.判断对象对应的类是否加载、链接和初始化"></a>1.判断对象对应的类是否加载、链接和初始化</h3><p>当<code>Java</code>虚拟机遇到一条字节码<code>new</code>指令时，首先先检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。这部分细节将在后续的文章中呈现。</p>
+<h3 id="2-为对象分配内存"><a href="#2-为对象分配内存" class="headerlink" title="2.为对象分配内存"></a>2.为对象分配内存</h3><p>在类加载检查通过后，接下来虚拟机将为新生对象分配内存。对象所需内存的大小在类加载完成后便可以完全确定，为对象分配空间的任务实际上便是等同于把一块确定大小的内存块从<code>Java</code>堆中划分出来。内存分配根据<code>Java</code>堆是否规整，有两种方式：</p>
+<p>①指针碰撞：如果<code>Java</code>堆的内存是规整的，即所有用过的内存放在一边，而空闲的内存放在另一边。分配内存时将位于中间的指针指示器向空闲的内存移动一段与对象大小相等的距离，这样便完成内存分配的工作</p>
+<p>②空闲列表：如果<code>Java</code>堆内存不是规整的，则需要由虚拟机维护一个列表来记录哪些内存是可用的，这样在分配的时候可以从列表中查询到足够大的内存分配给对象，并在分配后更新列表记录。</p>
+<p><code>Java</code>堆的内存分配是否规整根据所采用的垃圾收集器是否带有压缩整理功能有关。</p>
+<h3 id="3-处理并发问题"><a href="#3-处理并发问题" class="headerlink" title="3.处理并发问题"></a>3.处理并发问题</h3><p>除如何划分可用空间之外，还有另外一个需要考虑的问题：对象创建在虚拟机中是非常频繁的行为，即使仅仅修改一个指针所指向的位置，在并发情况下也并不是线程安全的，可能出现正在给对象A分配内存，指针还没来得及修改，对象B又同时使用了原来指针来分配内存的情况。解决这个问题有两种可选方案：</p>
+<p>①对分配内存空间的动作进行同步处理，比如在虚拟机采用<code>CAS</code>算法并配上失败重试的方式保证更新操作的原子性。</p>
+<p>②每个线程在<code>Java</code>堆中预先分配一小块内存，这块内存称为本地线程分配缓冲<code>(Thread Local Allocation Buffer, TLAB)</code>，线程需要分配内存时，就在对应线程的<code>TLAB</code>上分配内存，当线程中的<code>TLAB</code>用完并且被分配到了新的<code>TLAB</code>时，这时候才需要上述的同步锁定。</p>
+<h3 id="4-初始化零值"><a href="#4-初始化零值" class="headerlink" title="4.初始化零值"></a>4.初始化零值</h3><p>将分配到的内存，除了对象头外都初始化零值。这步操作保证了对象的实例字段在<code>Java</code>代码中可以不赋值就直接使用，使程序能访问到这些字段的数据类型所对应的零值。</p>
+<h3 id="5-设置对象头"><a href="#5-设置对象头" class="headerlink" title="5.设置对象头"></a>5.设置对象头</h3><p>将对象的所属类、对象的<code>hashcode</code>和对象的<code>GC</code>分代年龄等数据存储在对象的对象头中。</p>
+<h3 id="6-执行init方法进行初始化"><a href="#6-执行init方法进行初始化" class="headerlink" title="6.执行init方法进行初始化"></a>6.执行init方法进行初始化</h3><p>执行<code>init</code>方法，初始化对象的成员变量、调用类的构造方法，这样一个对象就被创建了出来。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java对象</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>垃圾收集算法</title>
     <url>/2020/04/17/gc-method/</url>
     <content><![CDATA[<p>本文介绍常见的垃圾收集算法。</p>
@@ -199,6 +274,24 @@
       </tags>
   </entry>
   <entry>
+    <title>对象的内存结构</title>
+    <url>/2020/03/25/object/</url>
+    <content><![CDATA[<p>“<code>Java</code>中对象的内存结构是怎样的呢？”</p>
+<span id="more"></span>
+
+<p>对象在内存中存储的布局可以分为3块区域：对象头<code>（Header）</code>、实例数据<code>（Instance Data）</code>和对齐填充<code>（Padding）</code>。</p>
+<h2 id="1-对象头的结构"><a href="#1-对象头的结构" class="headerlink" title="1.对象头的结构"></a>1.对象头的结构</h2><p><code>HotSpot</code>虚拟机的对象头包括两部分信息，第一部分用于存储对象自身的运行时数据，如哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等，这部分数据的长度在32位和64位的虚拟机中分别为32bit和64bit，官方称它为<code>“Mark Word”</code>；对象头的另外一部分是类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
+<h2 id="2-实例数据"><a href="#2-实例数据" class="headerlink" title="2.实例数据"></a>2.实例数据</h2><p>实例数据部分是对象真正存储的有效信息，也既是我们在程序代码里所定义的各种类型的字段内容，无论是从父类继承下来的，还是在子类中定义的都需要记录下来。</p>
+<h2 id="3-对其填充"><a href="#3-对其填充" class="headerlink" title="3.对其填充"></a>3.对其填充</h2><p>对齐填充并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。由于<code>HotSpot VM</code>的自动内存管理系统要求对象起始地址必须是8字节的整数倍，换句话说就是对象的大小必须是8字节的整数倍。对象头正好是8字节的倍数，因此当对象实例数据部分没有对齐的话，就需要通过对齐填充来补全。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Kotlin为什么将class设计成final类型</title>
     <url>/2021/01/02/kotlinclass/</url>
     <content><![CDATA[<p>“<code>Kotlin</code>开发人员为什么将类设计成<code>final</code>类型？”</p>
@@ -240,32 +333,6 @@
       <tags>
         <tag>Kotlin</tag>
         <tag>OOP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>对象的创建</title>
-    <url>/2020/03/30/createobj/</url>
-    <content><![CDATA[<p><code>Java</code>是一门面向对象的编程语言，<code>Java</code>程序运行过程中无时无刻都有对象被创建出来。在语言层面上，创建对象通常（例外：复制、反序列化）仅仅是一个<code>new</code>关键字而已，而在虚拟机中，普通<code>Java</code>对象的创建又是怎样一个过程呢？</p>
-<span id="more"></span>
-
-<p><code>Java</code>对象的创建包含以下几步：</p>
-<h3 id="1-判断对象对应的类是否加载、链接和初始化"><a href="#1-判断对象对应的类是否加载、链接和初始化" class="headerlink" title="1.判断对象对应的类是否加载、链接和初始化"></a>1.判断对象对应的类是否加载、链接和初始化</h3><p>当<code>Java</code>虚拟机遇到一条字节码<code>new</code>指令时，首先先检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。这部分细节将在后续的文章中呈现。</p>
-<h3 id="2-为对象分配内存"><a href="#2-为对象分配内存" class="headerlink" title="2.为对象分配内存"></a>2.为对象分配内存</h3><p>在类加载检查通过后，接下来虚拟机将为新生对象分配内存。对象所需内存的大小在类加载完成后便可以完全确定，为对象分配空间的任务实际上便是等同于把一块确定大小的内存块从<code>Java</code>堆中划分出来。内存分配根据<code>Java</code>堆是否规整，有两种方式：</p>
-<p>①指针碰撞：如果<code>Java</code>堆的内存是规整的，即所有用过的内存放在一边，而空闲的内存放在另一边。分配内存时将位于中间的指针指示器向空闲的内存移动一段与对象大小相等的距离，这样便完成内存分配的工作</p>
-<p>②空闲列表：如果<code>Java</code>堆内存不是规整的，则需要由虚拟机维护一个列表来记录哪些内存是可用的，这样在分配的时候可以从列表中查询到足够大的内存分配给对象，并在分配后更新列表记录。</p>
-<p><code>Java</code>堆的内存分配是否规整根据所采用的垃圾收集器是否带有压缩整理功能有关。</p>
-<h3 id="3-处理并发问题"><a href="#3-处理并发问题" class="headerlink" title="3.处理并发问题"></a>3.处理并发问题</h3><p>除如何划分可用空间之外，还有另外一个需要考虑的问题：对象创建在虚拟机中是非常频繁的行为，即使仅仅修改一个指针所指向的位置，在并发情况下也并不是线程安全的，可能出现正在给对象A分配内存，指针还没来得及修改，对象B又同时使用了原来指针来分配内存的情况。解决这个问题有两种可选方案：</p>
-<p>①对分配内存空间的动作进行同步处理，比如在虚拟机采用<code>CAS</code>算法并配上失败重试的方式保证更新操作的原子性。</p>
-<p>②每个线程在<code>Java</code>堆中预先分配一小块内存，这块内存称为本地线程分配缓冲<code>(Thread Local Allocation Buffer, TLAB)</code>，线程需要分配内存时，就在对应线程的<code>TLAB</code>上分配内存，当线程中的<code>TLAB</code>用完并且被分配到了新的<code>TLAB</code>时，这时候才需要上述的同步锁定。</p>
-<h3 id="4-初始化零值"><a href="#4-初始化零值" class="headerlink" title="4.初始化零值"></a>4.初始化零值</h3><p>将分配到的内存，除了对象头外都初始化零值。这步操作保证了对象的实例字段在<code>Java</code>代码中可以不赋值就直接使用，使程序能访问到这些字段的数据类型所对应的零值。</p>
-<h3 id="5-设置对象头"><a href="#5-设置对象头" class="headerlink" title="5.设置对象头"></a>5.设置对象头</h3><p>将对象的所属类、对象的<code>hashcode</code>和对象的<code>GC</code>分代年龄等数据存储在对象的对象头中。</p>
-<h3 id="6-执行init方法进行初始化"><a href="#6-执行init方法进行初始化" class="headerlink" title="6.执行init方法进行初始化"></a>6.执行init方法进行初始化</h3><p>执行<code>init</code>方法，初始化对象的成员变量、调用类的构造方法，这样一个对象就被创建了出来。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java对象</tag>
       </tags>
   </entry>
   <entry>
@@ -336,24 +403,6 @@
       </categories>
       <tags>
         <tag>单例</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>对象的内存结构</title>
-    <url>/2020/03/25/object/</url>
-    <content><![CDATA[<p>“<code>Java</code>中对象的内存结构是怎样的呢？”</p>
-<span id="more"></span>
-
-<p>对象在内存中存储的布局可以分为3块区域：对象头<code>（Header）</code>、实例数据<code>（Instance Data）</code>和对齐填充<code>（Padding）</code>。</p>
-<h2 id="1-对象头的结构"><a href="#1-对象头的结构" class="headerlink" title="1.对象头的结构"></a>1.对象头的结构</h2><p><code>HotSpot</code>虚拟机的对象头包括两部分信息，第一部分用于存储对象自身的运行时数据，如哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等，这部分数据的长度在32位和64位的虚拟机中分别为32bit和64bit，官方称它为<code>“Mark Word”</code>；对象头的另外一部分是类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
-<h2 id="2-实例数据"><a href="#2-实例数据" class="headerlink" title="2.实例数据"></a>2.实例数据</h2><p>实例数据部分是对象真正存储的有效信息，也既是我们在程序代码里所定义的各种类型的字段内容，无论是从父类继承下来的，还是在子类中定义的都需要记录下来。</p>
-<h2 id="3-对其填充"><a href="#3-对其填充" class="headerlink" title="3.对其填充"></a>3.对其填充</h2><p>对齐填充并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。由于<code>HotSpot VM</code>的自动内存管理系统要求对象起始地址必须是8字节的整数倍，换句话说就是对象的大小必须是8字节的整数倍。对象头正好是8字节的倍数，因此当对象实例数据部分没有对齐的话，就需要通过对齐填充来补全。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
