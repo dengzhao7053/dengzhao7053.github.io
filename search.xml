@@ -1,19 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>注解解析之反射</title>
+    <url>/2020/04/19/annotation2/</url>
+    <content><![CDATA[<p>如果没有用来读取注解的工具，那注解也不会比注释更有用。使用注解的过程中，很重要的一个部分就是创建与使用注解处理器。<code>Java SE5</code> 扩展了<strong>反射机制</strong>的<code>API</code>，以帮助程序员构造这类工具。</p>
+<span id="more"></span>
+<h2 id="注解解析"><a href="#注解解析" class="headerlink" title="注解解析"></a>注解解析</h2><p>反射类位于包<code>java.lang.reflect</code>，提供了一个接口<code>AnnotatedElement</code>，该接口主要有以下几个实现类：<code>Class</code>，<code>Constructor</code>，<code>Field</code>，<code>Method</code>，<code>Package</code>。调用<code>AnnotatedElement</code>对象的如下方法可以访问<code>Annotation</code>信息:</p>
+<ul>
+<li><code>getAnnotation(Class&lt;T&gt; annotationClass)</code>：返回该程序元素上存在的指定类型的注解，如果该类型的注解不存在，则返回<code>null</code>。</li>
+<li><code>Annotation[] getAnnotations()</code>：返回此元素上存在的所有注释。</li>
+<li><code>Annotation[] getDeclaredAnnotations()</code>：返回直接存在于此元素上的所有注释。与此接口中的其他方法不同，该方法将忽略继承的注释。</li>
+<li><code>boolean isAnnotationPresent(Class&lt;?extendsAnnotation&gt; annotationClass)</code>：判断该程序元素上是否存在指定类型的注释，存在返回<code>true</code>，否则返回<code>false</code>。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>注解</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>注解</title>
     <url>/2020/04/19/annotations/</url>
-    <content><![CDATA[<p>注解（也被称为元数据）为我们在代码中添加信息提供了一种形式化的方法，使我们可以在稍后某个时刻非常方便地使用这些数据。</p>
+    <content><![CDATA[<p><strong>注解</strong>（也被称为元数据）为我们在代码中添加信息提供了一种形式化的方法，使我们可以在稍后某个时刻非常方便地使用这些数据。</p>
 <span id="more"></span>
 
-<p>注解是众多引入到Java SE5中的重要语言变化之一。他们可以提供用来完整地描述程序所需的信息，而这些信息是无法用Java来表达的。因此，注解使得我们能够以将由编译器来测试和验证的格式，存储有关程序的额外信息。注解可以用来生成描述符文件，甚至或是新的类定义，并且有助于减轻编写“样板”代码的负担。通过使用注解，我们可以将这些元数据保存在Java源代码中，并利用annotation API为自己的注解构造处理工具，同时，注解的优点还包括：更加干净易读的代码以及编译期类型检查等。虽然Java SE5预先定义了一些元数据，但一般来说，主要还是需要程序员自己添加新的注解，并按照自己的方式使用他们。</p>
-<h2 id="内置注解"><a href="#内置注解" class="headerlink" title="内置注解"></a>内置注解</h2><h3 id="标准注解"><a href="#标准注解" class="headerlink" title="标准注解"></a>标准注解</h3><p>Java SE5 内置了3种标准注解，定义在java.lang中：</p>
+<p>注解是众多引入到 <code>Java SE5</code> 中的重要语言变化之一。他们可以提供用来完整地描述程序所需的信息，而这些信息是无法用 <code>Java</code> 来表达的。因此，注解使得我们能够以将由编译器来测试和验证的格式，存储有关程序的额外信息。注解可以用来生成描述符文件，甚至或是新的类定义，并且有助于减轻编写“样板”代码的负担。通过使用注解，我们可以将这些元数据保存在 <code>Java</code> 源代码中，并利用 <code>annotation API</code> 为自己的注解构造处理工具，同时，注解的优点还包括：更加干净易读的代码以及编译期类型检查等。虽然 <code>Java SE5</code> 预先定义了一些元数据，但一般来说，主要还是需要程序员自己添加新的注解，并按照自己的方式使用他们。</p>
+<h2 id="内置注解"><a href="#内置注解" class="headerlink" title="内置注解"></a>内置注解</h2><h3 id="标准注解"><a href="#标准注解" class="headerlink" title="标准注解"></a>标准注解</h3><p><code>Java SE5</code> 内置了3种标准注解，定义在 <code>java.lang</code> 中：</p>
 <ul>
 <li><code>@Override</code>，表示当前的方法定义将覆盖超类中的方法。</li>
 <li><code>@Deprecated</code>，表示某一程序元素不建议使用了（过时了）。</li>
 <li><code>@SuppressWarnings</code>，用于关闭不当的编译器警告信息。</li>
 </ul>
-<h3 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h3><p>Java目前内置了四种元注解。元注解专职负责注解其他的注解：</p>
+<h3 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h3><p><code>Java</code>目前内置了四种元注解。元注解专职负责注解其他的注解：</p>
 <ul>
 <li><code>@Target</code>，表示该注解可以用于什么地方。可能的ElementType参数包括：<pre><code>      CONSTRUCTOR：构造器的声明
       FIELD：域声明
@@ -32,7 +52,7 @@
 <li><code>@Documented</code>，将此注解包含在JavaDoc中。</li>
 <li><code>@Inherited</code>，允许子类继承父类中的注解——如果某个类使用了@Xxx注解（定义该Annotation时使用了@Inherited修饰）修饰，则其子类将自动被@Xxx修饰。</li>
 </ul>
-<h2 id="定义注解"><a href="#定义注解" class="headerlink" title="定义注解"></a>定义注解</h2><p>下边是创建的自定义注解，看起来很像接口的定义，事实上，与其它任何Java接口一样，注解也将会被编译成class文件。</p>
+<h2 id="定义注解"><a href="#定义注解" class="headerlink" title="定义注解"></a>定义注解</h2><p>下边是创建的自定义注解，看起来很像接口的定义，事实上，与其它任何 <code>Java</code> 接口一样，注解也将会被编译成 <code>class</code> 文件。</p>
 <pre><code>@Target(ElementType.Method)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Test&#123;
@@ -274,24 +294,6 @@ public @interface Test&#123;
       </tags>
   </entry>
   <entry>
-    <title>对象的内存结构</title>
-    <url>/2020/03/25/object/</url>
-    <content><![CDATA[<p>“<code>Java</code>中对象的内存结构是怎样的呢？”</p>
-<span id="more"></span>
-
-<p>对象在内存中存储的布局可以分为3块区域：对象头<code>（Header）</code>、实例数据<code>（Instance Data）</code>和对齐填充<code>（Padding）</code>。</p>
-<h2 id="1-对象头的结构"><a href="#1-对象头的结构" class="headerlink" title="1.对象头的结构"></a>1.对象头的结构</h2><p><code>HotSpot</code>虚拟机的对象头包括两部分信息，第一部分用于存储对象自身的运行时数据，如哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等，这部分数据的长度在32位和64位的虚拟机中分别为32bit和64bit，官方称它为<code>“Mark Word”</code>；对象头的另外一部分是类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
-<h2 id="2-实例数据"><a href="#2-实例数据" class="headerlink" title="2.实例数据"></a>2.实例数据</h2><p>实例数据部分是对象真正存储的有效信息，也既是我们在程序代码里所定义的各种类型的字段内容，无论是从父类继承下来的，还是在子类中定义的都需要记录下来。</p>
-<h2 id="3-对其填充"><a href="#3-对其填充" class="headerlink" title="3.对其填充"></a>3.对其填充</h2><p>对齐填充并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。由于<code>HotSpot VM</code>的自动内存管理系统要求对象起始地址必须是8字节的整数倍，换句话说就是对象的大小必须是8字节的整数倍。对象头正好是8字节的倍数，因此当对象实例数据部分没有对齐的话，就需要通过对齐填充来补全。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Kotlin为什么将class设计成final类型</title>
     <url>/2021/01/02/kotlinclass/</url>
     <content><![CDATA[<p>“<code>Kotlin</code>开发人员为什么将类设计成<code>final</code>类型？”</p>
@@ -352,6 +354,24 @@ public @interface Test&#123;
       </categories>
       <tags>
         <tag>memory</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>对象的内存结构</title>
+    <url>/2020/03/25/object/</url>
+    <content><![CDATA[<p>“<code>Java</code>中对象的内存结构是怎样的呢？”</p>
+<span id="more"></span>
+
+<p>对象在内存中存储的布局可以分为3块区域：对象头<code>（Header）</code>、实例数据<code>（Instance Data）</code>和对齐填充<code>（Padding）</code>。</p>
+<h2 id="1-对象头的结构"><a href="#1-对象头的结构" class="headerlink" title="1.对象头的结构"></a>1.对象头的结构</h2><p><code>HotSpot</code>虚拟机的对象头包括两部分信息，第一部分用于存储对象自身的运行时数据，如哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等，这部分数据的长度在32位和64位的虚拟机中分别为32bit和64bit，官方称它为<code>“Mark Word”</code>；对象头的另外一部分是类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
+<h2 id="2-实例数据"><a href="#2-实例数据" class="headerlink" title="2.实例数据"></a>2.实例数据</h2><p>实例数据部分是对象真正存储的有效信息，也既是我们在程序代码里所定义的各种类型的字段内容，无论是从父类继承下来的，还是在子类中定义的都需要记录下来。</p>
+<h2 id="3-对其填充"><a href="#3-对其填充" class="headerlink" title="3.对其填充"></a>3.对其填充</h2><p>对齐填充并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。由于<code>HotSpot VM</code>的自动内存管理系统要求对象起始地址必须是8字节的整数倍，换句话说就是对象的大小必须是8字节的整数倍。对象头正好是8字节的倍数，因此当对象实例数据部分没有对齐的话，就需要通过对齐填充来补全。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
