@@ -266,27 +266,49 @@ public @interface Test&#123;
       </tags>
   </entry>
   <entry>
-    <title>Homebrew安装</title>
-    <url>/2022/07/18/homebrew/</url>
-    <content><![CDATA[<p><strong>Homebrew</strong>是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索、等很多实用的功能。简单的一条指令，就可以实现包管理。官网地址：<a href="https://brew.sh/">https://brew.sh</a></p>
+    <title>Gradle学习（一）：初识Gradle</title>
+    <url>/2022/08/29/gradle/</url>
+    <content><![CDATA[<p><code>Gradle</code>是一套基于JVM的新一代自动化构建工具。早期，构建只有编译和打包的简单需求。但是现代软件开发的模式改变了，大多数项目都包含有多而杂的技术栈、混合的多种编程语言，并且使用多种测试策略。随着敏捷实践的崛起，构建不得不更早地支持代码集成，以及频繁和简单地交付软件到测试和产品环境。<code>Gradle</code>便是在这一背景下衍生出来的。</p>
 <span id="more"></span>
-
-<h2 id="Homebrew安装"><a href="#Homebrew安装" class="headerlink" title="Homebrew安装"></a>Homebrew安装</h2><p>1.打开终端<br>2.输入安装命令</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
+<p>Gradle 的座右铭:</p>
+<pre><code>    “让不可能成为可能，让可能变得简单，让简单变得优雅”。
 </code></pre>
-<p>由于国内某些网络原因，导致<code>http://raw.githubusercontent.com</code>无法访问，通常会提示以下错误：</p>
-<pre><code>Failed to connect to http://raw.githubusercontent.com port 443: Connection refused
+<h2 id="1-认识Gradle"><a href="#1-认识Gradle" class="headerlink" title="1.认识Gradle"></a>1.认识Gradle</h2><p><code>Gradle</code>是基于JVM构建工具的新一代版本，它从现有的构建工具如Ant和Maven中学到了许多东西，并且把它们的最优思想提升到更高层次。遵循基于约定的构建方式，Gradle可以用一种声明式的方式为你的问题领域建模，它使用一种强大的且具有表达性的基于Groovy的领域特定语言（DSL），而不是XML。因为Gradle是基于JVM的，它允许你使用自己最喜欢的Java或者Groovy语言来编写定制逻辑。</p>
+<h3 id="1-1-Gradle的优点"><a href="#1-1-Gradle的优点" class="headerlink" title="1.1 Gradle的优点"></a>1.1 Gradle的优点</h3><ul>
+<li>表达性的DSL：Gradle构建脚本采用基于Groovy的DSL领域特定语言，而不是采用传统的XML文件，相比Maven等构建系统更加简洁易读；</li>
+<li>基于JVM：Groovy语言基于JVM，这使得Gradle支持Java/Kotlin代码编译构建脚本，你不必成为Groovy的专家才能开始写脚本，降低了Gradle的学习难度。</li>
+<li>增量性构建：大型项目可能拥有上百个模块，构建和测试少量代码的改变会消耗很多时间。Gradle支持指定任务的输入和输出进行增量性构建。它准确的找出哪些任务需要跳过，哪些需要构建或者部分构建。同样的思想也应用到多模块项目中，叫做部分构建。</li>
+<li>自定义Task：可以构建自己的任务，然后挂接到Gradle构建的生命周期中去。</li>
+</ul>
+<h3 id="1-2-Gradle工程的基本结构"><a href="#1-2-Gradle工程的基本结构" class="headerlink" title="1.2 Gradle工程的基本结构"></a>1.2 Gradle工程的基本结构</h3><pre><code>├── a-subproject
+│   └── build.gradle
+├── build.gradle
+├── settings.gradle
+├── gradle.properties
+├── local.properties
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradlew
+└── gradlew.bat
 </code></pre>
-<p><strong>解决方法：</strong><br>使用国内代理安装，命令行如下：</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&quot;
-</code></pre>
-<p>卸载命令行如下：</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&quot;
-</code></pre>
-<p>3.检查安装情况<br>执行命令行<code>brew --version</code>，显示Homebrew版本号则表示安装成功。</p>
-]]></content>
+<ul>
+<li>settings.gradle文件：确定哪些模块参与构建；</li>
+<li>项目级build.gradle文件：定义子模块公共的配置参数；</li>
+<li>模块级build.gradle文件：用于定义子模块的配置参数，它可以覆盖项目级build.gradle中定义的配置；</li>
+<li>gradle/wrapper：负责自动下载安装项目所需的Gradle环境的脚本；</li>
+<li>gradle.properties：项目级gradle配置项，回覆盖全局的配置项；</li>
+<li>local.properties：项目的私有属性配置，如SDK安装目录，一般不会被加入版本控制；</li>
+<li>gradlew和gradlew.bat：用来执行构建任务的脚本。命令行gradlew使用Gradle Wrapperz执行构建；命令行gradle使用系统环境变量定义的Gradle环境变量进行构建。</li>
+</ul>
+<h2 id="2-Gradle构建的生命周期"><a href="#2-Gradle构建的生命周期" class="headerlink" title="2 Gradle构建的生命周期"></a>2 Gradle构建的生命周期</h2><p>Gradle将构建划分为三个阶段：初始化阶段（Initialization）、配置阶段（Configuration）、执行阶段（Execution）。通过理解构建的生命周期，可以知道脚本中每个代码单元的执行时机。</p>
+<h3 id="2-1-初始化阶段"><a href="#2-1-初始化阶段" class="headerlink" title="2.1 初始化阶段"></a>2.1 初始化阶段</h3><h3 id="2-2-配置阶段"><a href="#2-2-配置阶段" class="headerlink" title="2.2 配置阶段"></a>2.2 配置阶段</h3><h3 id="2-3-执行阶段"><a href="#2-3-执行阶段" class="headerlink" title="2.3 执行阶段"></a>2.3 执行阶段</h3>]]></content>
+      <categories>
+        <category>Gradle</category>
+      </categories>
       <tags>
-        <tag>develop tools</tag>
+        <tag>Gradle</tag>
       </tags>
   </entry>
   <entry>
@@ -315,6 +337,30 @@ public @interface Test&#123;
       </categories>
       <tags>
         <tag>JMM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Homebrew安装</title>
+    <url>/2022/07/18/homebrew/</url>
+    <content><![CDATA[<p><strong>Homebrew</strong>是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索、等很多实用的功能。简单的一条指令，就可以实现包管理。官网地址：<a href="https://brew.sh/">https://brew.sh</a></p>
+<span id="more"></span>
+
+<h2 id="Homebrew安装"><a href="#Homebrew安装" class="headerlink" title="Homebrew安装"></a>Homebrew安装</h2><p>1.打开终端<br>2.输入安装命令</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
+</code></pre>
+<p>由于国内某些网络原因，导致<code>http://raw.githubusercontent.com</code>无法访问，通常会提示以下错误：</p>
+<pre><code>Failed to connect to http://raw.githubusercontent.com port 443: Connection refused
+</code></pre>
+<p><strong>解决方法：</strong><br>使用国内代理安装，命令行如下：</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&quot;
+</code></pre>
+<p>卸载命令行如下：</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&quot;
+</code></pre>
+<p>3.检查安装情况<br>执行命令行<code>brew --version</code>，显示Homebrew版本号则表示安装成功。</p>
+]]></content>
+      <tags>
+        <tag>develop tools</tag>
       </tags>
   </entry>
   <entry>

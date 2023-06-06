@@ -22,16 +22,19 @@
     var CONFIG = {"hostname":"dengzhao7053.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Levi&#39;s Blog">
-<meta property="og:url" content="https://dengzhao7053.github.io/archives/2020/08/index.html">
+  <meta name="description" content="Gradle是一套基于JVM的新一代自动化构建工具。早期，构建只有编译和打包的简单需求。但是现代软件开发的模式改变了，大多数项目都包含有多而杂的技术栈、混合的多种编程语言，并且使用多种测试策略。随着敏捷实践的崛起，构建不得不更早地支持代码集成，以及频繁和简单地交付软件到测试和产品环境。Gradle便是在这一背景下衍生出来的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gradle学习（一）：初识Gradle">
+<meta property="og:url" content="https://dengzhao7053.github.io/2022/08/29/gradle/index.html">
 <meta property="og:site_name" content="Levi&#39;s Blog">
-<meta property="og:description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
+<meta property="og:description" content="Gradle是一套基于JVM的新一代自动化构建工具。早期，构建只有编译和打包的简单需求。但是现代软件开发的模式改变了，大多数项目都包含有多而杂的技术栈、混合的多种编程语言，并且使用多种测试策略。随着敏捷实践的崛起，构建不得不更早地支持代码集成，以及频繁和简单地交付软件到测试和产品环境。Gradle便是在这一背景下衍生出来的。">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-08-29T15:40:58.000Z">
+<meta property="article:modified_time" content="2023-06-06T16:18:25.342Z">
+<meta property="article:tag" content="Gradle">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://dengzhao7053.github.io/archives/2020/08/">
+<link rel="canonical" href="https://dengzhao7053.github.io/2022/08/29/gradle/">
 
 
 <script id="page-configurations">
@@ -39,12 +42,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Levi's Blog</title>
+  <title>Gradle学习（一）：初识Gradle | Levi's Blog</title>
   
 
 
@@ -180,56 +183,164 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dengzhao7053.github.io/2022/08/29/gradle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Levi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Gradle学习（一）：初识Gradle
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-29 23:40:58" itemprop="dateCreated datePublished" datetime="2022-08-29T23:40:58+08:00">2022-08-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Gradle/" itemprop="url" rel="index"><span itemprop="name">Gradle</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
   
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 16 篇日志。 继续努力。</span>
-      </div>
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/08/29/gradle/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/08/29/gradle/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2020</span>
+        <p><code>Gradle</code>是一套基于JVM的新一代自动化构建工具。早期，构建只有编译和打包的简单需求。但是现代软件开发的模式改变了，大多数项目都包含有多而杂的技术栈、混合的多种编程语言，并且使用多种测试策略。随着敏捷实践的崛起，构建不得不更早地支持代码集成，以及频繁和简单地交付软件到测试和产品环境。<code>Gradle</code>便是在这一背景下衍生出来的。</p>
+<span id="more"></span>
+<p>Gradle 的座右铭:</p>
+<pre><code>    “让不可能成为可能，让可能变得简单，让简单变得优雅”。
+</code></pre>
+<h2 id="1-认识Gradle"><a href="#1-认识Gradle" class="headerlink" title="1.认识Gradle"></a>1.认识Gradle</h2><p><code>Gradle</code>是基于JVM构建工具的新一代版本，它从现有的构建工具如Ant和Maven中学到了许多东西，并且把它们的最优思想提升到更高层次。遵循基于约定的构建方式，Gradle可以用一种声明式的方式为你的问题领域建模，它使用一种强大的且具有表达性的基于Groovy的领域特定语言（DSL），而不是XML。因为Gradle是基于JVM的，它允许你使用自己最喜欢的Java或者Groovy语言来编写定制逻辑。</p>
+<h3 id="1-1-Gradle的优点"><a href="#1-1-Gradle的优点" class="headerlink" title="1.1 Gradle的优点"></a>1.1 Gradle的优点</h3><ul>
+<li>表达性的DSL：Gradle构建脚本采用基于Groovy的DSL领域特定语言，而不是采用传统的XML文件，相比Maven等构建系统更加简洁易读；</li>
+<li>基于JVM：Groovy语言基于JVM，这使得Gradle支持Java/Kotlin代码编译构建脚本，你不必成为Groovy的专家才能开始写脚本，降低了Gradle的学习难度。</li>
+<li>增量性构建：大型项目可能拥有上百个模块，构建和测试少量代码的改变会消耗很多时间。Gradle支持指定任务的输入和输出进行增量性构建。它准确的找出哪些任务需要跳过，哪些需要构建或者部分构建。同样的思想也应用到多模块项目中，叫做部分构建。</li>
+<li>自定义Task：可以构建自己的任务，然后挂接到Gradle构建的生命周期中去。</li>
+</ul>
+<h3 id="1-2-Gradle工程的基本结构"><a href="#1-2-Gradle工程的基本结构" class="headerlink" title="1.2 Gradle工程的基本结构"></a>1.2 Gradle工程的基本结构</h3><pre><code>├── a-subproject
+│   └── build.gradle
+├── build.gradle
+├── settings.gradle
+├── gradle.properties
+├── local.properties
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradlew
+└── gradlew.bat
+</code></pre>
+<ul>
+<li>settings.gradle文件：确定哪些模块参与构建；</li>
+<li>项目级build.gradle文件：定义子模块公共的配置参数；</li>
+<li>模块级build.gradle文件：用于定义子模块的配置参数，它可以覆盖项目级build.gradle中定义的配置；</li>
+<li>gradle/wrapper：负责自动下载安装项目所需的Gradle环境的脚本；</li>
+<li>gradle.properties：项目级gradle配置项，回覆盖全局的配置项；</li>
+<li>local.properties：项目的私有属性配置，如SDK安装目录，一般不会被加入版本控制；</li>
+<li>gradlew和gradlew.bat：用来执行构建任务的脚本。命令行gradlew使用Gradle Wrapperz执行构建；命令行gradle使用系统环境变量定义的Gradle环境变量进行构建。</li>
+</ul>
+<h2 id="2-Gradle构建的生命周期"><a href="#2-Gradle构建的生命周期" class="headerlink" title="2 Gradle构建的生命周期"></a>2 Gradle构建的生命周期</h2><p>Gradle将构建划分为三个阶段：初始化阶段（Initialization）、配置阶段（Configuration）、执行阶段（Execution）。通过理解构建的生命周期，可以知道脚本中每个代码单元的执行时机。</p>
+<h3 id="2-1-初始化阶段"><a href="#2-1-初始化阶段" class="headerlink" title="2.1 初始化阶段"></a>2.1 初始化阶段</h3><h3 id="2-2-配置阶段"><a href="#2-2-配置阶段" class="headerlink" title="2.2 配置阶段"></a>2.2 配置阶段</h3><h3 id="2-3-执行阶段"><a href="#2-3-执行阶段" class="headerlink" title="2.3 执行阶段"></a>2.3 执行阶段</h3>
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-08-21T00:57:40+08:00"
-              content="2020-08-21">
-          08-21
-        </time>
-      </div>
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Gradle/" rel="tag"># Gradle</a>
+          </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/08/21/singleton/" itemprop="url">
-            <span itemprop="name">枚举单例</span>
-          </a>
-      </div>
+        
 
-    </header>
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/18/ohmyzsh/" rel="prev" title="Oh My Zsh 「安装 & 配置」">
+      <i class="fa fa-chevron-left"></i> Oh My Zsh 「安装 & 配置」
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
   </article>
-
-
-    </div>
-  </div>
   
   
-  
-
   
 
 
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -276,6 +387,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%AE%A4%E8%AF%86Gradle"><span class="nav-number">1.</span> <span class="nav-text">1.认识Gradle</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Gradle%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Gradle的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Gradle%E5%B7%A5%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 Gradle工程的基本结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Gradle%E6%9E%84%E5%BB%BA%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">2.</span> <span class="nav-text">2 Gradle构建的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%88%9D%E5%A7%8B%E5%8C%96%E9%98%B6%E6%AE%B5"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 初始化阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%85%8D%E7%BD%AE%E9%98%B6%E6%AE%B5"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 配置阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 执行阶段</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
