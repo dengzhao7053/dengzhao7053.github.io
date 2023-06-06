@@ -312,6 +312,30 @@ public @interface Test&#123;
       </tags>
   </entry>
   <entry>
+    <title>Homebrew安装</title>
+    <url>/2022/07/18/homebrew/</url>
+    <content><![CDATA[<p><strong>Homebrew</strong>是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索、等很多实用的功能。简单的一条指令，就可以实现包管理。官网地址：<a href="https://brew.sh/">https://brew.sh</a></p>
+<span id="more"></span>
+
+<h2 id="Homebrew安装"><a href="#Homebrew安装" class="headerlink" title="Homebrew安装"></a>Homebrew安装</h2><p>1.打开终端<br>2.输入安装命令</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
+</code></pre>
+<p>由于国内某些网络原因，导致<code>http://raw.githubusercontent.com</code>无法访问，通常会提示以下错误：</p>
+<pre><code>Failed to connect to http://raw.githubusercontent.com port 443: Connection refused
+</code></pre>
+<p><strong>解决方法：</strong><br>使用国内代理安装，命令行如下：</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&quot;
+</code></pre>
+<p>卸载命令行如下：</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&quot;
+</code></pre>
+<p>3.检查安装情况<br>执行命令行<code>brew --version</code>，显示Homebrew版本号则表示安装成功。</p>
+]]></content>
+      <tags>
+        <tag>develop tools</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Java内存模型</title>
     <url>/2020/04/01/jmm/</url>
     <content><![CDATA[<p><code>Java Memory Model</code></p>
@@ -337,30 +361,6 @@ public @interface Test&#123;
       </categories>
       <tags>
         <tag>JMM</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Homebrew安装</title>
-    <url>/2022/07/18/homebrew/</url>
-    <content><![CDATA[<p><strong>Homebrew</strong>是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索、等很多实用的功能。简单的一条指令，就可以实现包管理。官网地址：<a href="https://brew.sh/">https://brew.sh</a></p>
-<span id="more"></span>
-
-<h2 id="Homebrew安装"><a href="#Homebrew安装" class="headerlink" title="Homebrew安装"></a>Homebrew安装</h2><p>1.打开终端<br>2.输入安装命令</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
-</code></pre>
-<p>由于国内某些网络原因，导致<code>http://raw.githubusercontent.com</code>无法访问，通常会提示以下错误：</p>
-<pre><code>Failed to connect to http://raw.githubusercontent.com port 443: Connection refused
-</code></pre>
-<p><strong>解决方法：</strong><br>使用国内代理安装，命令行如下：</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&quot;
-</code></pre>
-<p>卸载命令行如下：</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&quot;
-</code></pre>
-<p>3.检查安装情况<br>执行命令行<code>brew --version</code>，显示Homebrew版本号则表示安装成功。</p>
-]]></content>
-      <tags>
-        <tag>develop tools</tag>
       </tags>
   </entry>
   <entry>
