@@ -176,32 +176,6 @@ public @interface Test&#123;
       </tags>
   </entry>
   <entry>
-    <title>对象的创建</title>
-    <url>/2020/03/30/createobj/</url>
-    <content><![CDATA[<p><code>Java</code>是一门面向对象的编程语言，<code>Java</code>程序运行过程中无时无刻都有对象被创建出来。在语言层面上，创建对象通常（例外：复制、反序列化）仅仅是一个<code>new</code>关键字而已，而在虚拟机中，普通<code>Java</code>对象的创建又是怎样一个过程呢？</p>
-<span id="more"></span>
-
-<p><code>Java</code>对象的创建包含以下几步：</p>
-<h3 id="1-判断对象对应的类是否加载、链接和初始化"><a href="#1-判断对象对应的类是否加载、链接和初始化" class="headerlink" title="1.判断对象对应的类是否加载、链接和初始化"></a>1.判断对象对应的类是否加载、链接和初始化</h3><p>当<code>Java</code>虚拟机遇到一条字节码<code>new</code>指令时，首先先检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。这部分细节将在后续的文章中呈现。</p>
-<h3 id="2-为对象分配内存"><a href="#2-为对象分配内存" class="headerlink" title="2.为对象分配内存"></a>2.为对象分配内存</h3><p>在类加载检查通过后，接下来虚拟机将为新生对象分配内存。对象所需内存的大小在类加载完成后便可以完全确定，为对象分配空间的任务实际上便是等同于把一块确定大小的内存块从<code>Java</code>堆中划分出来。内存分配根据<code>Java</code>堆是否规整，有两种方式：</p>
-<p>①指针碰撞：如果<code>Java</code>堆的内存是规整的，即所有用过的内存放在一边，而空闲的内存放在另一边。分配内存时将位于中间的指针指示器向空闲的内存移动一段与对象大小相等的距离，这样便完成内存分配的工作</p>
-<p>②空闲列表：如果<code>Java</code>堆内存不是规整的，则需要由虚拟机维护一个列表来记录哪些内存是可用的，这样在分配的时候可以从列表中查询到足够大的内存分配给对象，并在分配后更新列表记录。</p>
-<p><code>Java</code>堆的内存分配是否规整根据所采用的垃圾收集器是否带有压缩整理功能有关。</p>
-<h3 id="3-处理并发问题"><a href="#3-处理并发问题" class="headerlink" title="3.处理并发问题"></a>3.处理并发问题</h3><p>除如何划分可用空间之外，还有另外一个需要考虑的问题：对象创建在虚拟机中是非常频繁的行为，即使仅仅修改一个指针所指向的位置，在并发情况下也并不是线程安全的，可能出现正在给对象A分配内存，指针还没来得及修改，对象B又同时使用了原来指针来分配内存的情况。解决这个问题有两种可选方案：</p>
-<p>①对分配内存空间的动作进行同步处理，比如在虚拟机采用<code>CAS</code>算法并配上失败重试的方式保证更新操作的原子性。</p>
-<p>②每个线程在<code>Java</code>堆中预先分配一小块内存，这块内存称为本地线程分配缓冲<code>(Thread Local Allocation Buffer, TLAB)</code>，线程需要分配内存时，就在对应线程的<code>TLAB</code>上分配内存，当线程中的<code>TLAB</code>用完并且被分配到了新的<code>TLAB</code>时，这时候才需要上述的同步锁定。</p>
-<h3 id="4-初始化零值"><a href="#4-初始化零值" class="headerlink" title="4.初始化零值"></a>4.初始化零值</h3><p>将分配到的内存，除了对象头外都初始化零值。这步操作保证了对象的实例字段在<code>Java</code>代码中可以不赋值就直接使用，使程序能访问到这些字段的数据类型所对应的零值。</p>
-<h3 id="5-设置对象头"><a href="#5-设置对象头" class="headerlink" title="5.设置对象头"></a>5.设置对象头</h3><p>将对象的所属类、对象的<code>hashcode</code>和对象的<code>GC</code>分代年龄等数据存储在对象的对象头中。</p>
-<h3 id="6-执行init方法进行初始化"><a href="#6-执行init方法进行初始化" class="headerlink" title="6.执行init方法进行初始化"></a>6.执行init方法进行初始化</h3><p>执行<code>init</code>方法，初始化对象的成员变量、调用类的构造方法，这样一个对象就被创建了出来。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java对象</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>垃圾收集算法</title>
     <url>/2020/04/17/gc-method/</url>
     <content><![CDATA[<p>本文介绍常见的垃圾收集算法。</p>
@@ -235,6 +209,32 @@ public @interface Test&#123;
       </categories>
       <tags>
         <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>对象的创建</title>
+    <url>/2020/03/30/createobj/</url>
+    <content><![CDATA[<p><code>Java</code>是一门面向对象的编程语言，<code>Java</code>程序运行过程中无时无刻都有对象被创建出来。在语言层面上，创建对象通常（例外：复制、反序列化）仅仅是一个<code>new</code>关键字而已，而在虚拟机中，普通<code>Java</code>对象的创建又是怎样一个过程呢？</p>
+<span id="more"></span>
+
+<p><code>Java</code>对象的创建包含以下几步：</p>
+<h3 id="1-判断对象对应的类是否加载、链接和初始化"><a href="#1-判断对象对应的类是否加载、链接和初始化" class="headerlink" title="1.判断对象对应的类是否加载、链接和初始化"></a>1.判断对象对应的类是否加载、链接和初始化</h3><p>当<code>Java</code>虚拟机遇到一条字节码<code>new</code>指令时，首先先检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。这部分细节将在后续的文章中呈现。</p>
+<h3 id="2-为对象分配内存"><a href="#2-为对象分配内存" class="headerlink" title="2.为对象分配内存"></a>2.为对象分配内存</h3><p>在类加载检查通过后，接下来虚拟机将为新生对象分配内存。对象所需内存的大小在类加载完成后便可以完全确定，为对象分配空间的任务实际上便是等同于把一块确定大小的内存块从<code>Java</code>堆中划分出来。内存分配根据<code>Java</code>堆是否规整，有两种方式：</p>
+<p>①指针碰撞：如果<code>Java</code>堆的内存是规整的，即所有用过的内存放在一边，而空闲的内存放在另一边。分配内存时将位于中间的指针指示器向空闲的内存移动一段与对象大小相等的距离，这样便完成内存分配的工作</p>
+<p>②空闲列表：如果<code>Java</code>堆内存不是规整的，则需要由虚拟机维护一个列表来记录哪些内存是可用的，这样在分配的时候可以从列表中查询到足够大的内存分配给对象，并在分配后更新列表记录。</p>
+<p><code>Java</code>堆的内存分配是否规整根据所采用的垃圾收集器是否带有压缩整理功能有关。</p>
+<h3 id="3-处理并发问题"><a href="#3-处理并发问题" class="headerlink" title="3.处理并发问题"></a>3.处理并发问题</h3><p>除如何划分可用空间之外，还有另外一个需要考虑的问题：对象创建在虚拟机中是非常频繁的行为，即使仅仅修改一个指针所指向的位置，在并发情况下也并不是线程安全的，可能出现正在给对象A分配内存，指针还没来得及修改，对象B又同时使用了原来指针来分配内存的情况。解决这个问题有两种可选方案：</p>
+<p>①对分配内存空间的动作进行同步处理，比如在虚拟机采用<code>CAS</code>算法并配上失败重试的方式保证更新操作的原子性。</p>
+<p>②每个线程在<code>Java</code>堆中预先分配一小块内存，这块内存称为本地线程分配缓冲<code>(Thread Local Allocation Buffer, TLAB)</code>，线程需要分配内存时，就在对应线程的<code>TLAB</code>上分配内存，当线程中的<code>TLAB</code>用完并且被分配到了新的<code>TLAB</code>时，这时候才需要上述的同步锁定。</p>
+<h3 id="4-初始化零值"><a href="#4-初始化零值" class="headerlink" title="4.初始化零值"></a>4.初始化零值</h3><p>将分配到的内存，除了对象头外都初始化零值。这步操作保证了对象的实例字段在<code>Java</code>代码中可以不赋值就直接使用，使程序能访问到这些字段的数据类型所对应的零值。</p>
+<h3 id="5-设置对象头"><a href="#5-设置对象头" class="headerlink" title="5.设置对象头"></a>5.设置对象头</h3><p>将对象的所属类、对象的<code>hashcode</code>和对象的<code>GC</code>分代年龄等数据存储在对象的对象头中。</p>
+<h3 id="6-执行init方法进行初始化"><a href="#6-执行init方法进行初始化" class="headerlink" title="6.执行init方法进行初始化"></a>6.执行init方法进行初始化</h3><p>执行<code>init</code>方法，初始化对象的成员变量、调用类的构造方法，这样一个对象就被创建了出来。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java对象</tag>
       </tags>
   </entry>
   <entry>
@@ -302,8 +302,28 @@ public @interface Test&#123;
 <li>local.properties：项目的私有属性配置，如SDK安装目录，一般不会被加入版本控制；</li>
 <li>gradlew和gradlew.bat：用来执行构建任务的脚本。命令行gradlew使用Gradle Wrapperz执行构建；命令行gradle使用系统环境变量定义的Gradle环境变量进行构建。</li>
 </ul>
-<h2 id="2-Gradle构建的生命周期"><a href="#2-Gradle构建的生命周期" class="headerlink" title="2 Gradle构建的生命周期"></a>2 Gradle构建的生命周期</h2><p>Gradle将构建划分为三个阶段：初始化阶段（Initialization）、配置阶段（Configuration）、执行阶段（Execution）。通过理解构建的生命周期，可以知道脚本中每个代码单元的执行时机。</p>
-<h3 id="2-1-初始化阶段"><a href="#2-1-初始化阶段" class="headerlink" title="2.1 初始化阶段"></a>2.1 初始化阶段</h3><h3 id="2-2-配置阶段"><a href="#2-2-配置阶段" class="headerlink" title="2.2 配置阶段"></a>2.2 配置阶段</h3><h3 id="2-3-执行阶段"><a href="#2-3-执行阶段" class="headerlink" title="2.3 执行阶段"></a>2.3 执行阶段</h3>]]></content>
+<h2 id="2-Gradle构建的生命周期"><a href="#2-Gradle构建的生命周期" class="headerlink" title="2 Gradle构建的生命周期"></a>2 Gradle构建的生命周期</h2><p>Gradle将构建划分为三个阶段：初始化阶段<code>（Initialization）</code>、配置阶段<code>（Configuration）</code>、执行阶段<code>（Execution）</code>。通过理解构建的生命周期，可以知道脚本中每个代码单元的执行时机。</p>
+<h3 id="2-1-初始化阶段"><a href="#2-1-初始化阶段" class="headerlink" title="2.1 初始化阶段"></a>2.1 初始化阶段</h3><p>Gradle支持单模块和多模块构建。因此初始化阶段需要明确哪些模块将参与构建。主要包含以下几步：</p>
+<ul>
+<li><p>解析根目录下的<code>settings.gradle</code>文件，并实例化一个<code>settings</code>对象；</p>
+</li>
+<li><p>执行<code>settings.gradle</code>脚本，<code>settings.gradle</code>中的代码会在初始化阶段执行；</p>
+</li>
+<li><p>生成<code>Project</code>对象。<code>Gradle</code>会为<code>settings.gradle</code>中<code>include</code>的每个模块实例化一个<code>Project</code>对象。</p>
+</li>
+</ul>
+<h3 id="2-2-配置阶段"><a href="#2-2-配置阶段" class="headerlink" title="2.2 配置阶段"></a>2.2 配置阶段</h3><p>配置阶段，将执行参与构建的每个模块的build.gradle，已完成Project的配置。主要包含以下几步：</p>
+<ul>
+<li><p>下载依赖和插件；</p>
+</li>
+<li><p>执行build.gradle中的代码；</p>
+</li>
+<li><p>根据task的依赖关系构造一个有向无环图<code>（Directed Acyclic Graph）</code>，以便在执行阶段按照依赖关系执行task。</p>
+</li>
+</ul>
+<h3 id="2-3-执行阶段"><a href="#2-3-执行阶段" class="headerlink" title="2.3 执行阶段"></a>2.3 执行阶段</h3><p>配置阶段构造了task有向无环图，执行阶段会按照依赖关系执行task。</p>
+<p><font color="#dd0000">注意：<br>Task配置代码在配置阶段执行，Task动作在执行阶段执行；<br>即使是执行单一一个Task，整个工程的初始化阶段和配置阶段也会执行，这是为了支持在执行中访问Gradle构建模型中的任何一部分。<br></font></p>
+<h2 id="3-生命周期的监听"><a href="#3-生命周期的监听" class="headerlink" title="3 生命周期的监听"></a>3 生命周期的监听</h2>]]></content>
       <categories>
         <category>Gradle</category>
       </categories>
