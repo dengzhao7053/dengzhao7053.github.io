@@ -30,7 +30,7 @@
 <meta property="og:description" content="Gradle是一套基于JVM的新一代自动化构建工具。早期，构建只有编译和打包的简单需求。但是现代软件开发的模式改变了，大多数项目都包含有多而杂的技术栈、混合的多种编程语言，并且使用多种测试策略。随着敏捷实践的崛起，构建不得不更早地支持代码集成，以及频繁和简单地交付软件到测试和产品环境。Gradle便是在这一背景下衍生出来的。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-08-29T15:40:58.000Z">
-<meta property="article:modified_time" content="2023-06-07T16:33:23.758Z">
+<meta property="article:modified_time" content="2023-06-12T16:21:16.396Z">
 <meta property="article:tag" content="Gradle">
 <meta name="twitter:card" content="summary">
 
@@ -252,14 +252,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.9k</span>
+              <span>3.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -326,7 +326,113 @@
 </ul>
 <h3 id="2-3-执行阶段"><a href="#2-3-执行阶段" class="headerlink" title="2.3 执行阶段"></a>2.3 执行阶段</h3><p>配置阶段构造了task有向无环图，执行阶段会按照依赖关系执行task。</p>
 <p><font color="#dd0000">注意：<br>Task配置代码在配置阶段执行，Task动作在执行阶段执行；<br>即使是执行单一一个Task，整个工程的初始化阶段和配置阶段也会执行，这是为了支持在执行中访问Gradle构建模型中的任何一部分。<br></font></p>
-<h2 id="3-生命周期的监听"><a href="#3-生命周期的监听" class="headerlink" title="3 生命周期的监听"></a>3 生命周期的监听</h2>
+<h2 id="3-生命周期的监听"><a href="#3-生命周期的监听" class="headerlink" title="3 生命周期的监听"></a>3 生命周期的监听</h2><h3 id="3-1-初始化阶段监听"><a href="#3-1-初始化阶段监听" class="headerlink" title="3.1 初始化阶段监听"></a>3.1 初始化阶段监听</h3><p>初始化阶段包含解析settings.gradle文件、获取setting实例、创建Project实例。可以使用以下代码监听：</p>
+<pre><code>//settings配置完毕
+this.gradle.settingsEvaluated &#123;
+    println &quot;settings Evaluated&quot;
+&#125;
+
+//所有Project对象创建完成
+this.gradle.projectsLoaded &#123;
+    println &quot;projects Loaded&quot;
+&#125;
+</code></pre>
+<h3 id="3-2-配置阶段监听"><a href="#3-2-配置阶段监听" class="headerlink" title="3.2 配置阶段监听"></a>3.2 配置阶段监听</h3><p>Project接口提供了监听当前Project配置阶段执行的方法：</p>
+<pre><code>//执行build.gradle之前
+project.beforeEvaluate &#123;
+    ...
+&#125;
+
+//执行build.gradle之后
+project.afterEvaluate &#123;
+    ...
+&#125;
+</code></pre>
+<p>此外，Gradle接口也提供了配置阶段的监听：</p>
+<pre><code>//执行build.gradle之前
+gradle.beforeProject &#123;
+    
+&#125;
+
+//执行build.gradle之后
+gradle.afterProject &#123;
+    
+&#125;
+
+//与上边的方法等价
+gradle.addProjectEvaluationListener(new ProjectEvaluationListener() &#123;
+    @Override
+    void beforeEvaluate(Project project) &#123;
+
+    &#125;
+
+    @Override
+    void afterEvaluate(Project project, ProjectState projectState) &#123;
+
+    &#125;
+&#125;)
+
+//监听依赖关系解析完毕
+gradle.addListener(new DependencyResolutionListener() &#123;
+    @Override
+    void beforeResolve(ResolvableDependencies resolvableDependencies) &#123;
+
+    &#125;
+
+    @Override
+    void afterResolve(ResolvableDependencies resolvableDependencies) &#123;
+
+    &#125;
+&#125;)
+
+//task 有向无环图构造完毕
+gradle.taskGraph.whenReady &#123;
+    
+&#125;
+
+//所有的Project的build.gradle执行完毕
+gradle.projectsEvaluated &#123;
+    
+&#125;
+</code></pre>
+<h3 id="3-3-执行阶段监听"><a href="#3-3-执行阶段监听" class="headerlink" title="3.3 执行阶段监听"></a>3.3 执行阶段监听</h3><pre><code>//监听task执行
+gradle.addListener(new TaskExecutionListener() &#123;
+    
+    //执行前
+    @Override
+    void beforeExecute(Task task) &#123;
+
+    &#125;
+
+    //执行后
+    @Override
+    void afterExecute(Task task, TaskState taskState) &#123;
+
+    &#125;
+&#125;)
+
+//监听action列表执行
+gradle.addListener(new TaskActionListener() &#123;
+    
+    //开始执行Action列表之前，回调时机略晚于TaskExecutionListener#beforeExecute
+    @Override
+    void beforeActions(Task task) &#123;
+
+    &#125;
+
+    //执行Action列表之后，回调时机略早于TaskExecutionListener#afterExecute
+    @Override
+    void afterActions(Task task) &#123;
+
+    &#125;
+&#125;)
+</code></pre>
+<p>监听构建结束：</p>
+<pre><code>gradle.buildFinished &#123;
+    
+&#125;
+</code></pre>
+
     </div>
 
     
@@ -407,7 +513,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%AE%A4%E8%AF%86Gradle"><span class="nav-number">1.</span> <span class="nav-text">1.认识Gradle</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Gradle%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Gradle的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Gradle%E5%B7%A5%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 Gradle工程的基本结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Gradle%E6%9E%84%E5%BB%BA%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">2.</span> <span class="nav-text">2 Gradle构建的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%88%9D%E5%A7%8B%E5%8C%96%E9%98%B6%E6%AE%B5"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 初始化阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%85%8D%E7%BD%AE%E9%98%B6%E6%AE%B5"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 配置阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 执行阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%9A%84%E7%9B%91%E5%90%AC"><span class="nav-number">3.</span> <span class="nav-text">3 生命周期的监听</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%AE%A4%E8%AF%86Gradle"><span class="nav-number">1.</span> <span class="nav-text">1.认识Gradle</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Gradle%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Gradle的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Gradle%E5%B7%A5%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 Gradle工程的基本结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Gradle%E6%9E%84%E5%BB%BA%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">2.</span> <span class="nav-text">2 Gradle构建的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%88%9D%E5%A7%8B%E5%8C%96%E9%98%B6%E6%AE%B5"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 初始化阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%85%8D%E7%BD%AE%E9%98%B6%E6%AE%B5"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 配置阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 执行阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%9A%84%E7%9B%91%E5%90%AC"><span class="nav-number">3.</span> <span class="nav-text">3 生命周期的监听</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%88%9D%E5%A7%8B%E5%8C%96%E9%98%B6%E6%AE%B5%E7%9B%91%E5%90%AC"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 初始化阶段监听</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E9%85%8D%E7%BD%AE%E9%98%B6%E6%AE%B5%E7%9B%91%E5%90%AC"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 配置阶段监听</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E7%9B%91%E5%90%AC"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 执行阶段监听</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -480,12 +586,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">28k</span>
+    <span title="站点总字数">30k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">26 分钟</span>
+    <span title="站点阅读时长">27 分钟</span>
 </div>
 
         
