@@ -70,28 +70,6 @@ public @interface Test&#123;
       </tags>
   </entry>
   <entry>
-    <title>类加载器的双亲委派模型</title>
-    <url>/2020/04/15/classload2/</url>
-    <content><![CDATA[<p>一个类加载器收到了类加载的请求，它该如何去加载这个类呢？</p>
-<span id="more"></span>
-
-<p>双亲委派模型的工作过程是：如果一个类加载器收到了类加载的请求，它首先不会自己尝试去加载这个类，而是把这个请求委派给父类加载器去完成，每一个层次的类加载器都是如此，因此所有的加载请求最终都应该传递到顶层的启动类加载器中，只有当父类加载器反馈自己无法完成这个加载请求（它的搜索范围中没有找到所需的类）时，子加载器才会尝试自己去加载。</p>
-<p>双亲委派模型对于保证<code>Java</code>程序的稳定性运作很重要。使用双亲委派模型来组织类加载器之间的关系，有一个显而易见的好处就是<code>Java</code>类随着它的类加载器一起具备了一种带有优先级的层次关系。例如类<code>java.lang.Object</code>，它存放在<code>rt.java</code>之中，无论哪个类加载器要加载这个类，最终都是委派给启动类加载器进行加载，因此<code>Object</code>类在程序的各种类加载器环境中都是同一个类。相反，如果没有使用双亲委派模型，由各个类加载器自行加载的话，如果用户自己写了一个名为<code>java.lang.Object</code>的类，并放在程序的<code>ClassPath</code>中，那系统中将会出现多个不同的<code>Object</code>类，<code>Java</code>类型体系中最基础的行为也就无从保证，应用程序也将会变得一片混乱。</p>
-<p>综上，双亲委派模型的优点如下：</p>
-<ul>
-<li>避免重复加载，当父类加载器已经加载过该类时，子类加载器没必要再重复加载</li>
-<li>安全性考虑，防止核心<code>API</code>库被随意篡改</li>
-</ul>
-<p>附:子加载器和父类加载器是继承关系吗？</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>类加载</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>类加载过程</title>
     <url>/2020/04/14/classload/</url>
     <content><![CDATA[<p>这篇文章我们来了解<code>Java</code>虚拟机中类加载的全过程，即加载、验证、准备、解析和初始化这五个阶段所执行的具体动作。</p>
@@ -176,6 +154,28 @@ public @interface Test&#123;
       </tags>
   </entry>
   <entry>
+    <title>类加载器的双亲委派模型</title>
+    <url>/2020/04/15/classload2/</url>
+    <content><![CDATA[<p>一个类加载器收到了类加载的请求，它该如何去加载这个类呢？</p>
+<span id="more"></span>
+
+<p>双亲委派模型的工作过程是：如果一个类加载器收到了类加载的请求，它首先不会自己尝试去加载这个类，而是把这个请求委派给父类加载器去完成，每一个层次的类加载器都是如此，因此所有的加载请求最终都应该传递到顶层的启动类加载器中，只有当父类加载器反馈自己无法完成这个加载请求（它的搜索范围中没有找到所需的类）时，子加载器才会尝试自己去加载。</p>
+<p>双亲委派模型对于保证<code>Java</code>程序的稳定性运作很重要。使用双亲委派模型来组织类加载器之间的关系，有一个显而易见的好处就是<code>Java</code>类随着它的类加载器一起具备了一种带有优先级的层次关系。例如类<code>java.lang.Object</code>，它存放在<code>rt.java</code>之中，无论哪个类加载器要加载这个类，最终都是委派给启动类加载器进行加载，因此<code>Object</code>类在程序的各种类加载器环境中都是同一个类。相反，如果没有使用双亲委派模型，由各个类加载器自行加载的话，如果用户自己写了一个名为<code>java.lang.Object</code>的类，并放在程序的<code>ClassPath</code>中，那系统中将会出现多个不同的<code>Object</code>类，<code>Java</code>类型体系中最基础的行为也就无从保证，应用程序也将会变得一片混乱。</p>
+<p>综上，双亲委派模型的优点如下：</p>
+<ul>
+<li>避免重复加载，当父类加载器已经加载过该类时，子类加载器没必要再重复加载</li>
+<li>安全性考虑，防止核心<code>API</code>库被随意篡改</li>
+</ul>
+<p>附:子加载器和父类加载器是继承关系吗？</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>类加载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>对象的创建</title>
     <url>/2020/03/30/createobj/</url>
     <content><![CDATA[<p><code>Java</code>是一门面向对象的编程语言，<code>Java</code>程序运行过程中无时无刻都有对象被创建出来。在语言层面上，创建对象通常（例外：复制、反序列化）仅仅是一个<code>new</code>关键字而已，而在虚拟机中，普通<code>Java</code>对象的创建又是怎样一个过程呢？</p>
@@ -238,30 +238,6 @@ public @interface Test&#123;
       </tags>
   </entry>
   <entry>
-    <title>Homebrew安装</title>
-    <url>/2022/07/18/homebrew/</url>
-    <content><![CDATA[<p><strong>Homebrew</strong>是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索、等很多实用的功能。简单的一条指令，就可以实现包管理。官网地址：<a href="https://brew.sh/">https://brew.sh</a></p>
-<span id="more"></span>
-
-<h2 id="Homebrew安装"><a href="#Homebrew安装" class="headerlink" title="Homebrew安装"></a>Homebrew安装</h2><p>1.打开终端<br>2.输入安装命令</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
-</code></pre>
-<p>由于国内某些网络原因，导致<code>http://raw.githubusercontent.com</code>无法访问，通常会提示以下错误：</p>
-<pre><code>Failed to connect to http://raw.githubusercontent.com port 443: Connection refused
-</code></pre>
-<p><strong>解决方法：</strong><br>使用国内代理安装，命令行如下：</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&quot;
-</code></pre>
-<p>卸载命令行如下：</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&quot;
-</code></pre>
-<p>3.检查安装情况<br>执行命令行<code>brew --version</code>，显示Homebrew版本号则表示安装成功。</p>
-]]></content>
-      <tags>
-        <tag>develop tools</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>GC对象的判定方法</title>
     <url>/2020/04/16/gc-obj-decision-method/</url>
     <content><![CDATA[<p>在堆里面存放着<code>Java</code>世界中几乎所有的对象实例，垃圾收集器在对堆进行回收前，第一件事情就是要确定这些对象之中哪些还“存活”着，哪些已经死去。</p>
@@ -287,6 +263,137 @@ public @interface Test&#123;
       </categories>
       <tags>
         <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Gradle学习（二）：Project核心API</title>
+    <url>/2023/07/04/gradle-project/</url>
+    <content><![CDATA[<p>在Gradle术语中，一个项目（project）代表一个正在构建的组件（比如，一个JAR文件），或一个想要完成的目标，如部署应用程序。每个Gradle构建脚本build.gradle至少定义一个项目。当构建进程启动后，Gradle基于build.gradle中的配置实例化org.gradle.api.Project类，并且能够通过project变量使其隐式可用。</p>
+<span id="more"></span>
+
+<h2 id="1-Project相关API"><a href="#1-Project相关API" class="headerlink" title="1.Project相关API"></a>1.Project相关API</h2><p>Project提供了一系列操作Project对象的API。如下：</p>
+<pre><code>//返回工程RootProject
+Project getRootProject();
+
+//返回父Project，在RootProject中调用会返回null
+@Nullable
+Project getParent();
+
+//返回当前Project
+Project getProject();
+
+//返回一个Project的Set集合，包含当前Project和所有子Project
+Set&lt;Project&gt; getAllprojects();
+
+//返回一个Project的Set集合，包含所有子Project
+Set&lt;Project&gt; getSubprojects();
+
+//返回指定路径的Project，找不到时返回null
+@Nullable
+Project findProject(String path);
+
+//返回指定路径的Project，不存在时抛出UnknownProjectException
+Project project(String path) throws UnknownProjectException;
+
+//为所有子Project增加配置
+void subprojects(Closure var1);
+
+//为当前Project以及所有子Project增加配置
+void allprojects(Closure var1);
+</code></pre>
+<h2 id="2-Project属性相关API"><a href="#2-Project属性相关API" class="headerlink" title="2.Project属性相关API"></a>2.Project属性相关API</h2><p>Project提供了一系列操作属性的API，通过属性API可以实现在Project之间共享配置参数。如下：</p>
+<pre><code>//默认属性
+//默认的build文件名
+String DEFAULT_BUILD_FILE = &quot;build.gradle&quot;;
+//路径分隔符
+String PATH_SEPARATOR = &quot;:&quot;;
+//每个工程默认的输出文件夹名称
+String DEFAULT_BUILD_DIR_NAME = &quot;build&quot;;
+
+//是否存在指定属性名
+boolean hasProperty(String propertyName);
+
+//设置属性值，如果属性不存在则抛出MissingPropertyException
+void setProperty(String name, @Nullable Object value) throws MissingPropertyException;
+
+//获取属性值，如果不存在则抛出MissingPropertyException
+@Nullable
+Object property(String propertyName) throws MissingPropertyException;
+
+//查找属性值，如果不存在返回null
+@Nullable
+Object findProperty(String propertyName);
+</code></pre>
+<h3 id="2-1-ext扩展属性"><a href="#2-1-ext扩展属性" class="headerlink" title="2.1 ext扩展属性"></a>2.1 ext扩展属性</h3><p>gradle为Project提供了ext命名空间，用于定义扩展属性。子Project会继承父Project定义的ext属性，但是只读的。我们经常会在Root Project中定义ext属性，而在子Project中可以直接复用属性值。</p>
+<h2 id="3-Project文件相关API"><a href="#3-Project文件相关API" class="headerlink" title="3.Project文件相关API"></a>3.Project文件相关API</h2><h3 id="3-1-文件获取相关"><a href="#3-1-文件获取相关" class="headerlink" title="3.1 文件获取相关"></a>3.1 文件获取相关</h3><pre><code>//获取Project根目录(非项目根目录)
+File getRootDir();
+
+//build文件夹目录
+File getBuildDir();
+
+//获取项目目录
+File getProjectDir();
+</code></pre>
+<h3 id="3-2-文件定位相关"><a href="#3-2-文件定位相关" class="headerlink" title="3.2 文件定位相关"></a>3.2 文件定位相关</h3><pre><code>//获取单个文件，相对当前Project目录
+File file(Object path);
+
+//获取多个文件，相对当前Project目录
+ConfigurableFileCollection files(Object... paths);
+</code></pre>
+<h3 id="3-3-文件拷贝"><a href="#3-3-文件拷贝" class="headerlink" title="3.3 文件拷贝"></a>3.3 文件拷贝</h3><p>//文件拷贝，接受闭包作为参数。<br>WorkResult copy(Closure var1);<br>使用如下：</p>
+<pre><code>copy &#123;
+    //文件来源
+    from file(‘a.jks’)
+    //目的地
+    into getRootProject().getBuildDir().path + &quot;/apk/&quot;
+
+    exclude &#123;
+        //排除不需要拷贝的文件
+    &#125;
+
+    rename &#123;
+        //重命名
+    &#125;
+&#125;
+</code></pre>
+<h3 id="3-4-文件遍历"><a href="#3-4-文件遍历" class="headerlink" title="3.4 文件遍历"></a>3.4 文件遍历</h3><p>//将指定目录转化为文件树<br>ConfigurableFileTree fileTree(Object path);</p>
+<p>使用如下：</p>
+<pre><code>fileTree(&#39;build/output/apk&#39;)&#123; FileTree fileTree -&gt;
+    fileTree.visit&#123; FileTreeElement fileTreeElement -&gt;
+    
+    &#125;
+&#125;
+</code></pre>
+]]></content>
+      <categories>
+        <category>Gradle</category>
+      </categories>
+      <tags>
+        <tag>Gradle</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Homebrew安装</title>
+    <url>/2022/07/18/homebrew/</url>
+    <content><![CDATA[<p><strong>Homebrew</strong>是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索、等很多实用的功能。简单的一条指令，就可以实现包管理。官网地址：<a href="https://brew.sh/">https://brew.sh</a></p>
+<span id="more"></span>
+
+<h2 id="Homebrew安装"><a href="#Homebrew安装" class="headerlink" title="Homebrew安装"></a>Homebrew安装</h2><p>1.打开终端<br>2.输入安装命令</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
+</code></pre>
+<p>由于国内某些网络原因，导致<code>http://raw.githubusercontent.com</code>无法访问，通常会提示以下错误：</p>
+<pre><code>Failed to connect to http://raw.githubusercontent.com port 443: Connection refused
+</code></pre>
+<p><strong>解决方法：</strong><br>使用国内代理安装，命令行如下：</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&quot;
+</code></pre>
+<p>卸载命令行如下：</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&quot;
+</code></pre>
+<p>3.检查安装情况<br>执行命令行<code>brew --version</code>，显示Homebrew版本号则表示安装成功。</p>
+]]></content>
+      <tags>
+        <tag>develop tools</tag>
       </tags>
   </entry>
   <entry>
@@ -571,6 +678,32 @@ gradle.addListener(new TaskActionListener() &#123;
       </tags>
   </entry>
   <entry>
+    <title>Oh My Zsh 「安装 &amp; 配置」</title>
+    <url>/2022/07/18/ohmyzsh/</url>
+    <content><![CDATA[<p><code>Oh My Zsh</code>是一款社区驱动的命令行工具。它基于zsh命令行，提供了主题配置，插件机制，已经内置的便捷操作。给我们一种全新的方式使用命令行。<code>Oh My Zsh</code>官网：<a href="https://ohmyz.sh/">https://ohmyz.sh</a></p>
+<span id="more"></span>
+
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p><strong>Curl安装：</strong><br>使用国内镜像安装：</p>
+<pre><code>sh -c &quot;$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh)&quot;
+</code></pre>
+<p><strong>wget安装：</strong><br>使用国内镜像安装：</p>
+<pre><code>sh -c &quot;$(wget -O- https://gitee.com/pocmon/mirrors/raw/master/tools/install.sh)&quot;
+</code></pre>
+<h2 id="配置iterm2命令自动提示"><a href="#配置iterm2命令自动提示" class="headerlink" title="配置iterm2命令自动提示"></a>配置iterm2命令自动提示</h2><p>1.切换到<code>Oh My Zsh</code>的<code>Plugin</code>目录下，下载插件：</p>
+<pre><code>$ cd ~/.oh-my-zsh/plugins/
+$ git clone https://github.com/zsh-users/zsh-autosuggestions
+</code></pre>
+<p>2.编辑隐藏文件<code>~/.zshrc</code>，找到<code>plugins=(git)</code>一行，添加下边的代码：</p>
+<pre><code>plugins=(git zsh-autosuggestions)
+</code></pre>
+<p>3.让<code>~/.zshrc</code>配置生效。执行命令：<code>source ~/.zshrc</code></p>
+<p>至此，自动提示的插件也就安装完成啦。</p>
+]]></content>
+      <tags>
+        <tag>develop tools</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>枚举单例</title>
     <url>/2020/08/21/singleton/</url>
     <content><![CDATA[<p>单例模式是应用最广泛的模式之一。在应用这个模式时，单例对象的类必须保证只有一个实例存在。</p>
@@ -619,32 +752,6 @@ gradle.addListener(new TaskActionListener() &#123;
       </categories>
       <tags>
         <tag>单例</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Oh My Zsh 「安装 &amp; 配置」</title>
-    <url>/2022/07/18/ohmyzsh/</url>
-    <content><![CDATA[<p><code>Oh My Zsh</code>是一款社区驱动的命令行工具。它基于zsh命令行，提供了主题配置，插件机制，已经内置的便捷操作。给我们一种全新的方式使用命令行。<code>Oh My Zsh</code>官网：<a href="https://ohmyz.sh/">https://ohmyz.sh</a></p>
-<span id="more"></span>
-
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p><strong>Curl安装：</strong><br>使用国内镜像安装：</p>
-<pre><code>sh -c &quot;$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh)&quot;
-</code></pre>
-<p><strong>wget安装：</strong><br>使用国内镜像安装：</p>
-<pre><code>sh -c &quot;$(wget -O- https://gitee.com/pocmon/mirrors/raw/master/tools/install.sh)&quot;
-</code></pre>
-<h2 id="配置iterm2命令自动提示"><a href="#配置iterm2命令自动提示" class="headerlink" title="配置iterm2命令自动提示"></a>配置iterm2命令自动提示</h2><p>1.切换到<code>Oh My Zsh</code>的<code>Plugin</code>目录下，下载插件：</p>
-<pre><code>$ cd ~/.oh-my-zsh/plugins/
-$ git clone https://github.com/zsh-users/zsh-autosuggestions
-</code></pre>
-<p>2.编辑隐藏文件<code>~/.zshrc</code>，找到<code>plugins=(git)</code>一行，添加下边的代码：</p>
-<pre><code>plugins=(git zsh-autosuggestions)
-</code></pre>
-<p>3.让<code>~/.zshrc</code>配置生效。执行命令：<code>source ~/.zshrc</code></p>
-<p>至此，自动提示的插件也就安装完成啦。</p>
-]]></content>
-      <tags>
-        <tag>develop tools</tag>
       </tags>
   </entry>
   <entry>
