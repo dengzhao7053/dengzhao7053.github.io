@@ -22,16 +22,19 @@
     var CONFIG = {"hostname":"dengzhao7053.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Levi&#39;s Blog">
-<meta property="og:url" content="https://dengzhao7053.github.io/archives/2020/index.html">
+  <meta name="description" content="什么是序列化？ 序列化本质上就是把对象内存中的数据按照一定规则，变成一系列的字节数据（二进制数据），然后再把这些字节数据写入到流中。而反序列化的过程则相反，先读取字节数据，然后再重新组装成Java对象。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Serializable 和 Parcelable">
+<meta property="og:url" content="https://dengzhao7053.github.io/2023/07/08/serializable-parcelable/index.html">
 <meta property="og:site_name" content="Levi&#39;s Blog">
-<meta property="og:description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
+<meta property="og:description" content="什么是序列化？ 序列化本质上就是把对象内存中的数据按照一定规则，变成一系列的字节数据（二进制数据），然后再把这些字节数据写入到流中。而反序列化的过程则相反，先读取字节数据，然后再重新组装成Java对象。">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-07-08T03:22:56.000Z">
+<meta property="article:modified_time" content="2023-07-08T08:04:12.413Z">
+<meta property="article:tag" content="序列化">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://dengzhao7053.github.io/archives/2020/">
+<link rel="canonical" href="https://dengzhao7053.github.io/2023/07/08/serializable-parcelable/">
 
 
 <script id="page-configurations">
@@ -39,12 +42,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Levi's Blog</title>
+  <title>Serializable 和 Parcelable | Levi's Blog</title>
   
 
 
@@ -180,239 +183,184 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dengzhao7053.github.io/2023/07/08/serializable-parcelable/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="长夜将至，我从今开始守望，今夜如此，夜夜皆然。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Levi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Serializable 和 Parcelable
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-08 11:22:56" itemprop="dateCreated datePublished" datetime="2023-07-08T11:22:56+08:00">2023-07-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
   
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 19 篇日志。 继续努力。</span>
-      </div>
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2023/07/08/serializable-parcelable/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2023/07/08/serializable-parcelable/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2020</span>
-    </div>
+        <p>什么是序列化？</p>
+<p>序列化本质上就是把对象内存中的数据按照一定规则，变成一系列的字节数据（二进制数据），然后再把这些字节数据写入到流中。而反序列化的过程则相反，先读取字节数据，然后再重新组装成Java对象。</p>
+<span id="more"></span>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-08-21T00:57:40+08:00"
-              content="2020-08-21">
-          08-21
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/08/21/singleton/" itemprop="url">
-            <span itemprop="name">枚举单例</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-19T04:45:19+08:00"
-              content="2020-04-19">
-          04-19
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/19/annotation2/" itemprop="url">
-            <span itemprop="name">注解解析之反射</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-19T04:45:19+08:00"
-              content="2020-04-19">
-          04-19
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/19/annotations/" itemprop="url">
-            <span itemprop="name">注解</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-18T14:51:33+08:00"
-              content="2020-04-18">
-          04-18
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/18/collectors/" itemprop="url">
-            <span itemprop="name">经典垃圾收集器</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-17T15:41:42+08:00"
-              content="2020-04-17">
-          04-17
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/17/gc-method/" itemprop="url">
-            <span itemprop="name">垃圾收集算法</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-16T15:33:38+08:00"
-              content="2020-04-16">
-          04-16
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/16/gc-obj-decision-method/" itemprop="url">
-            <span itemprop="name">GC对象的判定方法</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-15T15:48:00+08:00"
-              content="2020-04-15">
-          04-15
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/15/classload2/" itemprop="url">
-            <span itemprop="name">类加载器的双亲委派模型</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-14T04:45:19+08:00"
-              content="2020-04-14">
-          04-14
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/14/classload/" itemprop="url">
-            <span itemprop="name">类加载过程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-02T15:16:12+08:00"
-              content="2020-04-02">
-          04-02
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/02/memory/" itemprop="url">
-            <span itemprop="name">Java内存区域</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-01T15:00:22+08:00"
-              content="2020-04-01">
-          04-01
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/04/01/jmm/" itemprop="url">
-            <span itemprop="name">Java内存模型</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+<h2 id="序列化的目的"><a href="#序列化的目的" class="headerlink" title="序列化的目的"></a>序列化的目的</h2><ul>
+<li>永久的保存对象数据（将对象数据保存在文件当中，或者磁盘中）</li>
+<li>通过序列化操作将对象数据在网络上进行传输（由于网络传输是以字节流的方式对数据进行传输的，因此序列化的目的是将对象数据转换成字节流的形式）</li>
+<li>将对象数据在进程之间传递</li>
+<li>序列化对象的时候只是针对变量进行序列化，不针对方法进行序列化</li>
+<li>在Intent之间，基本数据类型直接进行相关传递即可，但是一旦数据类型比较复杂的时候，就需要进行序列化操作了</li>
+</ul>
+<h2 id="Android中实现序列化的两种方式"><a href="#Android中实现序列化的两种方式" class="headerlink" title="Android中实现序列化的两种方式"></a>Android中实现序列化的两种方式</h2><p>1.implements Serializable接口<br>2.implements Parcelable接口（还需要实现接口内部的相应方法，写入数据的顺序和读出数据的顺序必须相同）</p>
+<h2 id="Serializable原理"><a href="#Serializable原理" class="headerlink" title="Serializable原理"></a>Serializable原理</h2><p>Java中的对象流操作是通过ObjectInputStream和ObjectOutputStream这两个流对象来实现的，在两个对象的使用过程中，源码里会判断对象是否实现Serializable接口，否则会抛出<code>java.io.NotSerializableException</code>。Serializable也可以自定义序列化过程，实现writeObject和readObject方法即可。</p>
+<p>1.Serializable只是一个接口，本身没有任何实现；<br>2.对象的反序列化并没有调用对象的任何构造方法；<br>3.serialVersionUID是用于记录文件版本信息的，最好能够自定义。否则系统会自动生成一个serialVersionUID，文件或者对象的任何改变，都会改变serialVersionUID，导致反序列化的失败，如果自定义就没有这个问题；<br>4.如果某个属性不想实现序列化，可以采用transient修饰；<br>5.Serializable的系统实现是采用ObjectOutputStream和ObjectInputStream实现的，这也是为什么调用ObjectInputStream和ObjectOutputStream时，需要对应的类实现Serializable接口。</p>
+<h2 id="使用Parcelable进行序列化操作"><a href="#使用Parcelable进行序列化操作" class="headerlink" title="使用Parcelable进行序列化操作"></a>使用Parcelable进行序列化操作</h2><p>1.writeToParcel将对象数据序列化成一个Parcel对象；<br>2.重写describeContents方法，默认值为0；<br>3.public static final Creator<T> CREATOR同时需要实现两个方法：<br>    createFromParcel(Parcel in)从Parcel容器中取出数据并进行转换<br>    newArray(int size) 返回对象数据的大小</p>
+<h2 id="Parcelable原理"><a href="#Parcelable原理" class="headerlink" title="Parcelable原理"></a>Parcelable原理</h2><p>无论是对数据的读还是写都需要使用Parcel作为中间层将数据进行传递。通过JNI相互调用，在java层先创建Parcel对象，然后在调用相关的读写操作时，首先将Java的Parcel对象转换成Parcel c++对象，然后被封装在Parcel中的相关数据由c++底层完成数据的序列化操作。<br>源码参考：<br><a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/jni/android_os_Parcel.cpp">https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/jni/android_os_Parcel.cpp</a></p>
+<p><a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/refs/heads/master:frameworks/native/libs/binder/Parcel.cpp">https://cs.android.com/android/platform/superproject/+/refs/heads/master:frameworks/native/libs/binder/Parcel.cpp</a></p>
+<ul>
+<li>整个读写全是在内存中进行，主要是通过malloc()、realloc()、memcpy()等内存操作进行，所以效率比Java系列化中使用外部存储器会高很多</li>
+<li>对于普通数据，使用的是mData内存地址，对于IBinder类型的数据以及FileDescriptor使用的是mObjects内存地址。后者是通过flatten_binder()和unflatten_binder()实现的，目的是反序列化时读出的对象就是原对象而不是重新new一个新对象。</li>
+</ul>
+<h2 id="使用时如何选择"><a href="#使用时如何选择" class="headerlink" title="使用时如何选择"></a>使用时如何选择</h2><ul>
+<li>内存方面，Parcelable比Serializable性能高，所以推荐使用Parcelable。</li>
+<li>Serializable在序列化的时候会产生大量的临时变量，从而引起频繁GC。</li>
+<li>Parcelable不能使用在要将数据存储在磁盘的情况，此时建议使用Serializable。</li>
+</ul>
+<h2 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>Serializable</th>
+<th>Parcelable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>存储媒介</td>
+<td>IO读写存储在硬盘上</td>
+<td>直接在内存中读写</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td>使用</td>
+<td>实现接口即可</td>
+<td>需要编写代码</td>
+</tr>
+<tr>
+<td>效率</td>
+<td>大量使用反射，效率低</td>
+<td>内存操作，效率高</td>
+</tr>
+</tbody></table>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BA%8F%E5%88%97%E5%8C%96/" rel="tag"># 序列化</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/06/gradle-task/" rel="prev" title="Gradle学习（三）：Task核心API">
+      <i class="fa fa-chevron-left"></i> Gradle学习（三）：Task核心API
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
   
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/archives/2020/page/2/">2</a><a class="extend next" rel="next" href="/archives/2020/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
+  
+  
 
 
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -459,6 +407,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E7%9B%AE%E7%9A%84"><span class="nav-number">1.</span> <span class="nav-text">序列化的目的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android%E4%B8%AD%E5%AE%9E%E7%8E%B0%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">Android中实现序列化的两种方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Serializable%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">Serializable原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Parcelable%E8%BF%9B%E8%A1%8C%E5%BA%8F%E5%88%97%E5%8C%96%E6%93%8D%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">使用Parcelable进行序列化操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Parcelable%E5%8E%9F%E7%90%86"><span class="nav-number">5.</span> <span class="nav-text">Parcelable原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%97%B6%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9"><span class="nav-number">6.</span> <span class="nav-text">使用时如何选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%AF%94"><span class="nav-number">7.</span> <span class="nav-text">对比</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
