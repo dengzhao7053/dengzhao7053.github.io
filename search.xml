@@ -238,6 +238,34 @@ public @interface Test&#123;
       </tags>
   </entry>
   <entry>
+    <title>GC对象的判定方法</title>
+    <url>/2020/04/16/gc-obj-decision-method/</url>
+    <content><![CDATA[<p>在堆里面存放着<code>Java</code>世界中几乎所有的对象实例，垃圾收集器在对堆进行回收前，第一件事情就是要确定这些对象之中哪些还“存活”着，哪些已经死去。</p>
+<span id="more"></span>
+
+<h3 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h3><p>引用计数法判断对象是否存活的算法是这样的：在对象中添加一个引用计数器，每当有一个地方引用它时，计数器值就加一；当引用失效时，计数器值就减一；任何时刻计数器为零的对象就是不可能再被使用的。</p>
+<p>客观的说，引用计数算法虽然占用了一些额外的内存空间来进行计数，但他的原理简单，判断效率也很高，在大多数情况下他都是一个不错的算法。但是在<code>Java</code>领域，至少主流的<code>Java</code>虚拟机里面都没有选用引用计数算法来管理内存，主要原因是，这个看似简单的算法有很多例外情况要考虑，必须要配合大量额外处理才能保证正确地工作，譬如单纯的引用技术就很难解决对象之间相互循环引用的问题。两个对象互相引用对方，导致它们的引用计数都不为零，即使这两个对象已经不可能再被访问，引用计数算法也无法回收它们。</p>
+<h3 id="可达性分析"><a href="#可达性分析" class="headerlink" title="可达性分析"></a>可达性分析</h3><p>当前主流的商用程序语言的内存管理子系统，都是通过可达性分析算法来判定对象是否存活。这个算法的基本思路就是通过一系列<code>GC Roots</code>的根对象作为起始节点集，从这些节点开始，根据引用关系向下搜索，搜索过程所走过的路径称为引用链，如果某个对象到<code>GC Roots</code>间没有任何引用链相连，或者用图论的话来说就是从<code>GC Roots</code>到这个对象不可达时，则证明此对象是不可能再被使用的。</p>
+<p>在<code>Java</code>技术体系里面，固定可作为<code>GC Roots</code>的对象包括以下几种：</p>
+<ul>
+<li>在虚拟机栈(栈帧中的本地变量表)中引用的对象，譬如各个线程被调用的方法堆栈中使用到的参数、布局变量、临时变量等。</li>
+<li>在方法区中类静态属性引用的对象，譬如<code>Java</code>类的引用类型静态变量。</li>
+<li>在方法区中常量引用的对象，譬如字符串常量池里的引用。</li>
+<li>在本地方法栈中<code>JNI</code>引用的对象。</li>
+<li>Java虚拟机内部的引用，如基本数据类型对应的<code>Class</code>对象，一些常驻的异常对象(比如<code>NullPointException、OutOfMemoryError</code>)等，还有系统加载器。</li>
+<li>所有被同步锁持有的对象。</li>
+<li>反映<code>Java</code>虚拟机内部情况的<code>JMXBean</code>、<code>JVMTI</code>中注册的回调、本地代码缓存等。</li>
+</ul>
+<p>即使在可达性分析算法中判定为不可达的对象，也不是“非死不可”的，这时候它们暂时还处于“缓刑”阶段，要真正宣告一个对象死亡，至少要经历两次标记过程：如果对象在进行可达性分析后发现没有与<code>GC Roots</code>相连接的引用链，那它将会被第一次标记，随后进行一次筛选，筛选的条件是此对象是否有必要执行<code>finalize</code>方法。假如对象没有覆盖<code>finalize</code>方法，或者<code>finalize</code>方法已经被虚拟机调用过，那么虚拟机将这两种情况都视为“没有必要执行”。如果这个对象被判定为确有必要执行<code>finalize</code>方法，那么该对象将会被放置在一个名为<code>F-Queue</code>的队列之中，并在稍后由一条虚拟机自动建立的、低调度优先级的<code>Finalizer</code>线程去执行它们的<code>finalize</code>方法。<code>finalize</code>方法是对象逃脱死亡命运的最后一次机会，稍后收集器将对<code>F-Queue</code>中的对象进行第二次小规模标记，如果对象要在<code>finalize</code>中成功拯救自己——只要重新与引用链上的任何一个对象建立关联即可，那在第二次标记是它将被移出“即将回收”的集合；如果对象这时候还没有逃脱，那基本上它就真的要被回收了。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Gradle学习（二）：Project核心API</title>
     <url>/2023/07/04/gradle-project/</url>
     <content><![CDATA[<p>在Gradle术语中，一个项目（project）代表一个正在构建的组件（比如，一个JAR文件），或一个想要完成的目标，如部署应用程序。每个Gradle构建脚本build.gradle至少定义一个项目。当构建进程启动后，Gradle基于build.gradle中的配置实例化org.gradle.api.Project类，并且能够通过project变量使其隐式可用。</p>
@@ -334,206 +362,6 @@ ConfigurableFileCollection files(Object... paths);
     fileTree.visit&#123; FileTreeElement fileTreeElement -&gt;
     
     &#125;
-&#125;
-</code></pre>
-]]></content>
-      <categories>
-        <category>Gradle</category>
-      </categories>
-      <tags>
-        <tag>Gradle</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>GC对象的判定方法</title>
-    <url>/2020/04/16/gc-obj-decision-method/</url>
-    <content><![CDATA[<p>在堆里面存放着<code>Java</code>世界中几乎所有的对象实例，垃圾收集器在对堆进行回收前，第一件事情就是要确定这些对象之中哪些还“存活”着，哪些已经死去。</p>
-<span id="more"></span>
-
-<h3 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h3><p>引用计数法判断对象是否存活的算法是这样的：在对象中添加一个引用计数器，每当有一个地方引用它时，计数器值就加一；当引用失效时，计数器值就减一；任何时刻计数器为零的对象就是不可能再被使用的。</p>
-<p>客观的说，引用计数算法虽然占用了一些额外的内存空间来进行计数，但他的原理简单，判断效率也很高，在大多数情况下他都是一个不错的算法。但是在<code>Java</code>领域，至少主流的<code>Java</code>虚拟机里面都没有选用引用计数算法来管理内存，主要原因是，这个看似简单的算法有很多例外情况要考虑，必须要配合大量额外处理才能保证正确地工作，譬如单纯的引用技术就很难解决对象之间相互循环引用的问题。两个对象互相引用对方，导致它们的引用计数都不为零，即使这两个对象已经不可能再被访问，引用计数算法也无法回收它们。</p>
-<h3 id="可达性分析"><a href="#可达性分析" class="headerlink" title="可达性分析"></a>可达性分析</h3><p>当前主流的商用程序语言的内存管理子系统，都是通过可达性分析算法来判定对象是否存活。这个算法的基本思路就是通过一系列<code>GC Roots</code>的根对象作为起始节点集，从这些节点开始，根据引用关系向下搜索，搜索过程所走过的路径称为引用链，如果某个对象到<code>GC Roots</code>间没有任何引用链相连，或者用图论的话来说就是从<code>GC Roots</code>到这个对象不可达时，则证明此对象是不可能再被使用的。</p>
-<p>在<code>Java</code>技术体系里面，固定可作为<code>GC Roots</code>的对象包括以下几种：</p>
-<ul>
-<li>在虚拟机栈(栈帧中的本地变量表)中引用的对象，譬如各个线程被调用的方法堆栈中使用到的参数、布局变量、临时变量等。</li>
-<li>在方法区中类静态属性引用的对象，譬如<code>Java</code>类的引用类型静态变量。</li>
-<li>在方法区中常量引用的对象，譬如字符串常量池里的引用。</li>
-<li>在本地方法栈中<code>JNI</code>引用的对象。</li>
-<li>Java虚拟机内部的引用，如基本数据类型对应的<code>Class</code>对象，一些常驻的异常对象(比如<code>NullPointException、OutOfMemoryError</code>)等，还有系统加载器。</li>
-<li>所有被同步锁持有的对象。</li>
-<li>反映<code>Java</code>虚拟机内部情况的<code>JMXBean</code>、<code>JVMTI</code>中注册的回调、本地代码缓存等。</li>
-</ul>
-<p>即使在可达性分析算法中判定为不可达的对象，也不是“非死不可”的，这时候它们暂时还处于“缓刑”阶段，要真正宣告一个对象死亡，至少要经历两次标记过程：如果对象在进行可达性分析后发现没有与<code>GC Roots</code>相连接的引用链，那它将会被第一次标记，随后进行一次筛选，筛选的条件是此对象是否有必要执行<code>finalize</code>方法。假如对象没有覆盖<code>finalize</code>方法，或者<code>finalize</code>方法已经被虚拟机调用过，那么虚拟机将这两种情况都视为“没有必要执行”。如果这个对象被判定为确有必要执行<code>finalize</code>方法，那么该对象将会被放置在一个名为<code>F-Queue</code>的队列之中，并在稍后由一条虚拟机自动建立的、低调度优先级的<code>Finalizer</code>线程去执行它们的<code>finalize</code>方法。<code>finalize</code>方法是对象逃脱死亡命运的最后一次机会，稍后收集器将对<code>F-Queue</code>中的对象进行第二次小规模标记，如果对象要在<code>finalize</code>中成功拯救自己——只要重新与引用链上的任何一个对象建立关联即可，那在第二次标记是它将被移出“即将回收”的集合；如果对象这时候还没有逃脱，那基本上它就真的要被回收了。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Gradle学习（一）：初识Gradle</title>
-    <url>/2022/08/29/gradle/</url>
-    <content><![CDATA[<p><code>Gradle</code>是一套基于JVM的新一代自动化构建工具。早期，构建只有编译和打包的简单需求。但是现代软件开发的模式改变了，大多数项目都包含有多而杂的技术栈、混合的多种编程语言，并且使用多种测试策略。随着敏捷实践的崛起，构建不得不更早地支持代码集成，以及频繁和简单地交付软件到测试和产品环境。<code>Gradle</code>便是在这一背景下衍生出来的。</p>
-<span id="more"></span>
-<p>Gradle 的座右铭:</p>
-<pre><code>    “让不可能成为可能，让可能变得简单，让简单变得优雅”。
-</code></pre>
-<h2 id="1-认识Gradle"><a href="#1-认识Gradle" class="headerlink" title="1.认识Gradle"></a>1.认识Gradle</h2><p><code>Gradle</code>是基于JVM构建工具的新一代版本，它从现有的构建工具如Ant和Maven中学到了许多东西，并且把它们的最优思想提升到更高层次。遵循基于约定的构建方式，Gradle可以用一种声明式的方式为你的问题领域建模，它使用一种强大的且具有表达性的基于Groovy的领域特定语言（DSL），而不是XML。因为Gradle是基于JVM的，它允许你使用自己最喜欢的Java或者Groovy语言来编写定制逻辑。</p>
-<h3 id="1-1-Gradle的优点"><a href="#1-1-Gradle的优点" class="headerlink" title="1.1 Gradle的优点"></a>1.1 Gradle的优点</h3><ul>
-<li>表达性的DSL：Gradle构建脚本采用基于Groovy的DSL领域特定语言，而不是采用传统的XML文件，相比Maven等构建系统更加简洁易读；</li>
-<li>基于JVM：Groovy语言基于JVM，这使得Gradle支持Java/Kotlin代码编译构建脚本，你不必成为Groovy的专家才能开始写脚本，降低了Gradle的学习难度。</li>
-<li>增量性构建：大型项目可能拥有上百个模块，构建和测试少量代码的改变会消耗很多时间。Gradle支持指定任务的输入和输出进行增量性构建。它准确的找出哪些任务需要跳过，哪些需要构建或者部分构建。同样的思想也应用到多模块项目中，叫做部分构建。</li>
-<li>自定义Task：可以构建自己的任务，然后挂接到Gradle构建的生命周期中去。</li>
-</ul>
-<h3 id="1-2-Gradle工程的基本结构"><a href="#1-2-Gradle工程的基本结构" class="headerlink" title="1.2 Gradle工程的基本结构"></a>1.2 Gradle工程的基本结构</h3><pre><code>├── a-subproject
-│   └── build.gradle
-├── build.gradle
-├── settings.gradle
-├── gradle.properties
-├── local.properties
-├── gradle
-│   └── wrapper
-│       ├── gradle-wrapper.jar
-│       └── gradle-wrapper.properties
-├── gradlew
-└── gradlew.bat
-</code></pre>
-<ul>
-<li>settings.gradle文件：确定哪些模块参与构建；</li>
-<li>项目级build.gradle文件：定义子模块公共的配置参数；</li>
-<li>模块级build.gradle文件：用于定义子模块的配置参数，它可以覆盖项目级build.gradle中定义的配置；</li>
-<li>gradle/wrapper：负责自动下载安装项目所需的Gradle环境的脚本；</li>
-<li>gradle.properties：项目级gradle配置项，回覆盖全局的配置项；</li>
-<li>local.properties：项目的私有属性配置，如SDK安装目录，一般不会被加入版本控制；</li>
-<li>gradlew和gradlew.bat：用来执行构建任务的脚本。命令行gradlew使用Gradle Wrapperz执行构建；命令行gradle使用系统环境变量定义的Gradle环境变量进行构建。</li>
-</ul>
-<h2 id="2-Gradle构建的生命周期"><a href="#2-Gradle构建的生命周期" class="headerlink" title="2 Gradle构建的生命周期"></a>2 Gradle构建的生命周期</h2><p>Gradle将构建划分为三个阶段：初始化阶段<code>（Initialization）</code>、配置阶段<code>（Configuration）</code>、执行阶段<code>（Execution）</code>。通过理解构建的生命周期，可以知道脚本中每个代码单元的执行时机。</p>
-<h3 id="2-1-初始化阶段"><a href="#2-1-初始化阶段" class="headerlink" title="2.1 初始化阶段"></a>2.1 初始化阶段</h3><p>Gradle支持单模块和多模块构建。因此初始化阶段需要明确哪些模块将参与构建。主要包含以下几步：</p>
-<ul>
-<li><p>解析根目录下的<code>settings.gradle</code>文件，并实例化一个<code>settings</code>对象；</p>
-</li>
-<li><p>执行<code>settings.gradle</code>脚本，<code>settings.gradle</code>中的代码会在初始化阶段执行；</p>
-</li>
-<li><p>生成<code>Project</code>对象。<code>Gradle</code>会为<code>settings.gradle</code>中<code>include</code>的每个模块实例化一个<code>Project</code>对象。</p>
-</li>
-</ul>
-<h3 id="2-2-配置阶段"><a href="#2-2-配置阶段" class="headerlink" title="2.2 配置阶段"></a>2.2 配置阶段</h3><p>配置阶段，将执行参与构建的每个模块的build.gradle，已完成Project的配置。主要包含以下几步：</p>
-<ul>
-<li><p>下载依赖和插件；</p>
-</li>
-<li><p>执行build.gradle中的代码；</p>
-</li>
-<li><p>根据task的依赖关系构造一个有向无环图<code>（Directed Acyclic Graph）</code>，以便在执行阶段按照依赖关系执行task。</p>
-</li>
-</ul>
-<h3 id="2-3-执行阶段"><a href="#2-3-执行阶段" class="headerlink" title="2.3 执行阶段"></a>2.3 执行阶段</h3><p>配置阶段构造了task有向无环图，执行阶段会按照依赖关系执行task。</p>
-<p><font color="#dd0000">注意：<br>Task配置代码在配置阶段执行，Task动作在执行阶段执行；<br>即使是执行单一一个Task，整个工程的初始化阶段和配置阶段也会执行，这是为了支持在执行中访问Gradle构建模型中的任何一部分。<br></font></p>
-<h2 id="3-生命周期的监听"><a href="#3-生命周期的监听" class="headerlink" title="3 生命周期的监听"></a>3 生命周期的监听</h2><h3 id="3-1-初始化阶段监听"><a href="#3-1-初始化阶段监听" class="headerlink" title="3.1 初始化阶段监听"></a>3.1 初始化阶段监听</h3><p>初始化阶段包含解析settings.gradle文件、获取setting实例、创建Project实例。可以使用以下代码监听：</p>
-<pre><code>//settings配置完毕
-this.gradle.settingsEvaluated &#123;
-    println &quot;settings Evaluated&quot;
-&#125;
-
-//所有Project对象创建完成
-this.gradle.projectsLoaded &#123;
-    println &quot;projects Loaded&quot;
-&#125;
-</code></pre>
-<h3 id="3-2-配置阶段监听"><a href="#3-2-配置阶段监听" class="headerlink" title="3.2 配置阶段监听"></a>3.2 配置阶段监听</h3><p>Project接口提供了监听当前Project配置阶段执行的方法：</p>
-<pre><code>//执行build.gradle之前
-project.beforeEvaluate &#123;
-    ...
-&#125;
-
-//执行build.gradle之后
-project.afterEvaluate &#123;
-    ...
-&#125;
-</code></pre>
-<p>此外，Gradle接口也提供了配置阶段的监听：</p>
-<pre><code>//执行build.gradle之前
-gradle.beforeProject &#123;
-    
-&#125;
-
-//执行build.gradle之后
-gradle.afterProject &#123;
-    
-&#125;
-
-//与上边的方法等价
-gradle.addProjectEvaluationListener(new ProjectEvaluationListener() &#123;
-    @Override
-    void beforeEvaluate(Project project) &#123;
-
-    &#125;
-
-    @Override
-    void afterEvaluate(Project project, ProjectState projectState) &#123;
-
-    &#125;
-&#125;)
-
-//监听依赖关系解析完毕
-gradle.addListener(new DependencyResolutionListener() &#123;
-    @Override
-    void beforeResolve(ResolvableDependencies resolvableDependencies) &#123;
-
-    &#125;
-
-    @Override
-    void afterResolve(ResolvableDependencies resolvableDependencies) &#123;
-
-    &#125;
-&#125;)
-
-//task 有向无环图构造完毕
-gradle.taskGraph.whenReady &#123;
-    
-&#125;
-
-//所有的Project的build.gradle执行完毕
-gradle.projectsEvaluated &#123;
-    
-&#125;
-</code></pre>
-<h3 id="3-3-执行阶段监听"><a href="#3-3-执行阶段监听" class="headerlink" title="3.3 执行阶段监听"></a>3.3 执行阶段监听</h3><pre><code>//监听task执行
-gradle.addListener(new TaskExecutionListener() &#123;
-    
-    //执行前
-    @Override
-    void beforeExecute(Task task) &#123;
-
-    &#125;
-
-    //执行后
-    @Override
-    void afterExecute(Task task, TaskState taskState) &#123;
-
-    &#125;
-&#125;)
-
-//监听action列表执行
-gradle.addListener(new TaskActionListener() &#123;
-    
-    //开始执行Action列表之前，回调时机略晚于TaskExecutionListener#beforeExecute
-    @Override
-    void beforeActions(Task task) &#123;
-
-    &#125;
-
-    //执行Action列表之后，回调时机略早于TaskExecutionListener#afterExecute
-    @Override
-    void afterActions(Task task) &#123;
-
-    &#125;
-&#125;)
-</code></pre>
-<p>监听构建结束：</p>
-<pre><code>gradle.buildFinished &#123;
-    
 &#125;
 </code></pre>
 ]]></content>
@@ -715,6 +543,84 @@ MyTask.dependsOn(HelloTask, GreetTask)
 <li>mustRunAfter强制顺序：指定强制要求的任务执行属性；</li>
 <li>shouldRunAfter非强制顺序：指定非强制的任务执行顺序，在两种情况下会放弃此规则：1、改规则造成环形顺序；2、并行执行并且任务的所有依赖项都已经完成。</li>
 </ul>
+<h2 id="9-Gradle中的增量编译"><a href="#9-Gradle中的增量编译" class="headerlink" title="9.Gradle中的增量编译"></a>9.Gradle中的增量编译</h2><p>在我们使用的各种工具中，为了提升工作效率，总会使用到各种各样的缓存技术。在Gradle中这种以task组合起来的构建工具也不例外。在Gradle中，这种技术叫做增量构建。这一特性能够节省大量构建时间。例如编译过源文件后就不应该重复编译，除非发生了影响输出的更改（例如修改或删除源文件）；</p>
+<p>Gradle通过对比自从上一次构建之后，task的inputs和outputs是否变化，来决定是否跳过执行。如果相同，则Gradle认为task是最新的，从而会跳过执行。在Build Outputs中看到Task名称旁边出现<code>UP-TO-DATE</code>标志，就说明该Task是被跳过的。<br><img src="task2.png" alt="task2"><br>那么在定义Task的输入输出时，要遵循一个原则：如果Task的一个属性会影响输出，那么应该将该属性注册为输入，否则会影响Task执行；相反如果Task的一个属性不会影响输出，那么不应该将该属性注册为输入，否则Task会在不必要时执行。</p>
+<h3 id="输入和输出"><a href="#输入和输出" class="headerlink" title="输入和输出"></a>输入和输出</h3><p>为了实现增量构建，gradle将每一个task都分为三部分，分别是input输入、任务本身和output输出。下图是一个典型的Java编译的task。<br><img src="task1.png" alt="task1"><br>以上图为例，input就是目标JDK版本、源文件等，output就是编译出来的class文件。<br>增量构建的原理就是监听input的变化，只有input发生变化了，才重新执行task，否则gradle认为可以重用之前的执行结果。</p>
+<h3 id="自定义inputs和outputs"><a href="#自定义inputs和outputs" class="headerlink" title="自定义inputs和outputs"></a>自定义inputs和outputs</h3><p>既然task中的input和output在增量构建中这么重要，我们需要了解如何在task中定义input和output。<br>如果我们自定义一个task，那么满足下面两点就可以使用上增量编译了：</p>
+<ul>
+<li>需要为task中的inputs和outputs添加必要的getter方法；</li>
+<li>为getter方法添加对应的注解。</li>
+</ul>
+<p>Gradle支持三种主要的inputs和outputs类型：</p>
+<ul>
+<li><p>1.简单类型：简单类型就是所有实现了Serializable接口的类型，比如String和数值。</p>
+</li>
+<li><p>2.文件类型：文件类型就是File或者FileCollection的衍生类型，或者其他可以作为参数传递给Project.file(java.lang.Object)和Project.files(java.lang.Object…)的类型。</p>
+</li>
+<li><p>3.嵌套类型：有些自定义类型，本身不属于前面的1和2两种类型，但是它内部含有嵌套的inputs和outputs属性，这样的类型叫做嵌套类型。<br>举个例子，如下：</p>
+<pre><code>public class ProcessTemplates extends DefaultTask &#123;
+  private TemplateEngineType templateEngine;
+  private FileCollection sourceFiles;
+  private TemplateData templateData;
+  private File outputDir;
+
+  @Input
+  public TemplateEngineType getTemplateEngine() &#123;
+      return this.templateEngine;
+  &#125;
+
+  @InputFiles
+  public FileCollection getSourceFiles() &#123;
+      return this.sourceFiles;
+  &#125;
+
+  @Nested
+  public TemplateData getTemplateData() &#123;
+      return this.templateData;
+  &#125;
+
+  @OutputDirectory
+  public File getOutputDir() &#123; return this.outputDir; &#125;
+
+  // 上面四个属性的setter方法
+
+  @TaskAction
+  public void processTemplates() &#123;
+      // ...
+  &#125;
+&#125;
+</code></pre>
+<p>上边的例子，我们定义了4个属性，分别为TemplateEngineType，FileCollection，TemplateData和File。前面三个属性是输入，后面一个属性是输出。<br>除了getter和setter方法之外，我们还需要在getter方法中添加相应的注解：<code>@Input 、@InputFiles 、@Nested 和 @OutputDirectory，</code>除此之外，我们还定义了一个 @TaskAction 表示这个task要做的工作。<br>这里的TemplateEngineType是一个枚举类，因为enum默认是实现Serializable的，所以这里可以作为@Input使用。<br>sourceFiles使用的是FileCollection，表示的是一系列文件的集合，所以可以使用@InputFiles。<br>为什么TemplateData是@Nested类型的呢？我们看下它的实现：</p>
+<pre><code>public class TemplateData &#123;
+  private String name;
+  private Map&lt;String, String&gt; variables;
+
+  public TemplateData(String name, Map&lt;String, String&gt; variables) &#123;
+      this.name = name;
+      this.variables = new HashMap&lt;&gt;(variables);
+  &#125;
+
+  @Input
+  public String getName() &#123; return this.name; &#125;
+
+  @Input
+  public Map&lt;String, String&gt; getVariables() &#123;
+      return this.variables;
+  &#125;
+&#125;
+</code></pre>
+<p>可以看到虽然TemplateData本身并不是File或者简单类型，但是它内部的属性是简单类型的，所以TemplateData本身可以看做是@Nested的。<br>使用了这些注解之后，gradle在构建的时候就会检测和上一次构建相比，这些属性有没有发送变化，如果没有发送变化，那么gradle将会直接使用上一次构建生成的缓存。</p>
+</li>
+</ul>
+<p>除了上述的4个注解，Gradle还提供其他几个注解，常用的注解如下：</p>
+<ul>
+<li>@InputFile：相当于File，表示单个input文件。</li>
+<li>@InputDirectory：相当于File，表示单个input目录。</li>
+<li>@OutputFile：相当于File，表示输出文件。</li>
+<li>@OutputFiles：相当于Map&lt;String, File&gt; 或者 Iterable<File>，表示输出文件。</li>
+<li>@OutputDirectories：相当于Map&lt;String, File&gt; 或者 Iterable<File>，表示输出文件。</li>
+<li>@Internal：内部属性，不是input也不是output。</li>
+</ul>
 ]]></content>
       <categories>
         <category>Gradle</category>
@@ -776,6 +682,178 @@ MyTask.dependsOn(HelloTask, GreetTask)
       </tags>
   </entry>
   <entry>
+    <title>Gradle学习（一）：初识Gradle</title>
+    <url>/2022/08/29/gradle/</url>
+    <content><![CDATA[<p><code>Gradle</code>是一套基于JVM的新一代自动化构建工具。早期，构建只有编译和打包的简单需求。但是现代软件开发的模式改变了，大多数项目都包含有多而杂的技术栈、混合的多种编程语言，并且使用多种测试策略。随着敏捷实践的崛起，构建不得不更早地支持代码集成，以及频繁和简单地交付软件到测试和产品环境。<code>Gradle</code>便是在这一背景下衍生出来的。</p>
+<span id="more"></span>
+<p>Gradle 的座右铭:</p>
+<pre><code>    “让不可能成为可能，让可能变得简单，让简单变得优雅”。
+</code></pre>
+<h2 id="1-认识Gradle"><a href="#1-认识Gradle" class="headerlink" title="1.认识Gradle"></a>1.认识Gradle</h2><p><code>Gradle</code>是基于JVM构建工具的新一代版本，它从现有的构建工具如Ant和Maven中学到了许多东西，并且把它们的最优思想提升到更高层次。遵循基于约定的构建方式，Gradle可以用一种声明式的方式为你的问题领域建模，它使用一种强大的且具有表达性的基于Groovy的领域特定语言（DSL），而不是XML。因为Gradle是基于JVM的，它允许你使用自己最喜欢的Java或者Groovy语言来编写定制逻辑。</p>
+<h3 id="1-1-Gradle的优点"><a href="#1-1-Gradle的优点" class="headerlink" title="1.1 Gradle的优点"></a>1.1 Gradle的优点</h3><ul>
+<li>表达性的DSL：Gradle构建脚本采用基于Groovy的DSL领域特定语言，而不是采用传统的XML文件，相比Maven等构建系统更加简洁易读；</li>
+<li>基于JVM：Groovy语言基于JVM，这使得Gradle支持Java/Kotlin代码编译构建脚本，你不必成为Groovy的专家才能开始写脚本，降低了Gradle的学习难度。</li>
+<li>增量性构建：大型项目可能拥有上百个模块，构建和测试少量代码的改变会消耗很多时间。Gradle支持指定任务的输入和输出进行增量性构建。它准确的找出哪些任务需要跳过，哪些需要构建或者部分构建。同样的思想也应用到多模块项目中，叫做部分构建。</li>
+<li>自定义Task：可以构建自己的任务，然后挂接到Gradle构建的生命周期中去。</li>
+</ul>
+<h3 id="1-2-Gradle工程的基本结构"><a href="#1-2-Gradle工程的基本结构" class="headerlink" title="1.2 Gradle工程的基本结构"></a>1.2 Gradle工程的基本结构</h3><pre><code>├── a-subproject
+│   └── build.gradle
+├── build.gradle
+├── settings.gradle
+├── gradle.properties
+├── local.properties
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradlew
+└── gradlew.bat
+</code></pre>
+<ul>
+<li>settings.gradle文件：确定哪些模块参与构建；</li>
+<li>项目级build.gradle文件：定义子模块公共的配置参数；</li>
+<li>模块级build.gradle文件：用于定义子模块的配置参数，它可以覆盖项目级build.gradle中定义的配置；</li>
+<li>gradle/wrapper：负责自动下载安装项目所需的Gradle环境的脚本；</li>
+<li>gradle.properties：项目级gradle配置项，回覆盖全局的配置项；</li>
+<li>local.properties：项目的私有属性配置，如SDK安装目录，一般不会被加入版本控制；</li>
+<li>gradlew和gradlew.bat：用来执行构建任务的脚本。命令行gradlew使用Gradle Wrapperz执行构建；命令行gradle使用系统环境变量定义的Gradle环境变量进行构建。</li>
+</ul>
+<h2 id="2-Gradle构建的生命周期"><a href="#2-Gradle构建的生命周期" class="headerlink" title="2 Gradle构建的生命周期"></a>2 Gradle构建的生命周期</h2><p>Gradle将构建划分为三个阶段：初始化阶段<code>（Initialization）</code>、配置阶段<code>（Configuration）</code>、执行阶段<code>（Execution）</code>。通过理解构建的生命周期，可以知道脚本中每个代码单元的执行时机。</p>
+<h3 id="2-1-初始化阶段"><a href="#2-1-初始化阶段" class="headerlink" title="2.1 初始化阶段"></a>2.1 初始化阶段</h3><p>Gradle支持单模块和多模块构建。因此初始化阶段需要明确哪些模块将参与构建。主要包含以下几步：</p>
+<ul>
+<li><p>解析根目录下的<code>settings.gradle</code>文件，并实例化一个<code>settings</code>对象；</p>
+</li>
+<li><p>执行<code>settings.gradle</code>脚本，<code>settings.gradle</code>中的代码会在初始化阶段执行；</p>
+</li>
+<li><p>生成<code>Project</code>对象。<code>Gradle</code>会为<code>settings.gradle</code>中<code>include</code>的每个模块实例化一个<code>Project</code>对象。</p>
+</li>
+</ul>
+<h3 id="2-2-配置阶段"><a href="#2-2-配置阶段" class="headerlink" title="2.2 配置阶段"></a>2.2 配置阶段</h3><p>配置阶段，将执行参与构建的每个模块的build.gradle，已完成Project的配置。主要包含以下几步：</p>
+<ul>
+<li><p>下载依赖和插件；</p>
+</li>
+<li><p>执行build.gradle中的代码；</p>
+</li>
+<li><p>根据task的依赖关系构造一个有向无环图<code>（Directed Acyclic Graph）</code>，以便在执行阶段按照依赖关系执行task。</p>
+</li>
+</ul>
+<h3 id="2-3-执行阶段"><a href="#2-3-执行阶段" class="headerlink" title="2.3 执行阶段"></a>2.3 执行阶段</h3><p>配置阶段构造了task有向无环图，执行阶段会按照依赖关系执行task。</p>
+<p><font color="#dd0000">注意：<br>Task配置代码在配置阶段执行，Task动作在执行阶段执行；<br>即使是执行单一一个Task，整个工程的初始化阶段和配置阶段也会执行，这是为了支持在执行中访问Gradle构建模型中的任何一部分。<br></font></p>
+<h2 id="3-生命周期的监听"><a href="#3-生命周期的监听" class="headerlink" title="3 生命周期的监听"></a>3 生命周期的监听</h2><h3 id="3-1-初始化阶段监听"><a href="#3-1-初始化阶段监听" class="headerlink" title="3.1 初始化阶段监听"></a>3.1 初始化阶段监听</h3><p>初始化阶段包含解析settings.gradle文件、获取setting实例、创建Project实例。可以使用以下代码监听：</p>
+<pre><code>//settings配置完毕
+this.gradle.settingsEvaluated &#123;
+    println &quot;settings Evaluated&quot;
+&#125;
+
+//所有Project对象创建完成
+this.gradle.projectsLoaded &#123;
+    println &quot;projects Loaded&quot;
+&#125;
+</code></pre>
+<h3 id="3-2-配置阶段监听"><a href="#3-2-配置阶段监听" class="headerlink" title="3.2 配置阶段监听"></a>3.2 配置阶段监听</h3><p>Project接口提供了监听当前Project配置阶段执行的方法：</p>
+<pre><code>//执行build.gradle之前
+project.beforeEvaluate &#123;
+    ...
+&#125;
+
+//执行build.gradle之后
+project.afterEvaluate &#123;
+    ...
+&#125;
+</code></pre>
+<p>此外，Gradle接口也提供了配置阶段的监听：</p>
+<pre><code>//执行build.gradle之前
+gradle.beforeProject &#123;
+    
+&#125;
+
+//执行build.gradle之后
+gradle.afterProject &#123;
+    
+&#125;
+
+//与上边的方法等价
+gradle.addProjectEvaluationListener(new ProjectEvaluationListener() &#123;
+    @Override
+    void beforeEvaluate(Project project) &#123;
+
+    &#125;
+
+    @Override
+    void afterEvaluate(Project project, ProjectState projectState) &#123;
+
+    &#125;
+&#125;)
+
+//监听依赖关系解析完毕
+gradle.addListener(new DependencyResolutionListener() &#123;
+    @Override
+    void beforeResolve(ResolvableDependencies resolvableDependencies) &#123;
+
+    &#125;
+
+    @Override
+    void afterResolve(ResolvableDependencies resolvableDependencies) &#123;
+
+    &#125;
+&#125;)
+
+//task 有向无环图构造完毕
+gradle.taskGraph.whenReady &#123;
+    
+&#125;
+
+//所有的Project的build.gradle执行完毕
+gradle.projectsEvaluated &#123;
+    
+&#125;
+</code></pre>
+<h3 id="3-3-执行阶段监听"><a href="#3-3-执行阶段监听" class="headerlink" title="3.3 执行阶段监听"></a>3.3 执行阶段监听</h3><pre><code>//监听task执行
+gradle.addListener(new TaskExecutionListener() &#123;
+    
+    //执行前
+    @Override
+    void beforeExecute(Task task) &#123;
+
+    &#125;
+
+    //执行后
+    @Override
+    void afterExecute(Task task, TaskState taskState) &#123;
+
+    &#125;
+&#125;)
+
+//监听action列表执行
+gradle.addListener(new TaskActionListener() &#123;
+    
+    //开始执行Action列表之前，回调时机略晚于TaskExecutionListener#beforeExecute
+    @Override
+    void beforeActions(Task task) &#123;
+
+    &#125;
+
+    //执行Action列表之后，回调时机略早于TaskExecutionListener#afterExecute
+    @Override
+    void afterActions(Task task) &#123;
+
+    &#125;
+&#125;)
+</code></pre>
+<p>监听构建结束：</p>
+<pre><code>gradle.buildFinished &#123;
+    
+&#125;
+</code></pre>
+]]></content>
+      <categories>
+        <category>Gradle</category>
+      </categories>
+      <tags>
+        <tag>Gradle</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Kotlin为什么将class设计成final类型</title>
     <url>/2021/01/02/kotlinclass/</url>
     <content><![CDATA[<p>“<code>Kotlin</code>开发人员为什么将类设计成<code>final</code>类型？”</p>
@@ -817,6 +895,92 @@ MyTask.dependsOn(HelloTask, GreetTask)
       <tags>
         <tag>Kotlin</tag>
         <tag>OOP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>相见欢·林花谢了春红</title>
+    <url>/2023/07/16/liyu-poem1/</url>
+    <content><![CDATA[<pre><code>相见欢·林花谢了春红
+李煜[五代]
+
+林花谢了春红，太匆匆。无奈朝来寒雨晚来风。
+
+胭脂泪，相留醉，几时重。自是人生长恨水长东。
+</code></pre>
+]]></content>
+      <categories>
+        <category>唐诗宋词</category>
+      </categories>
+      <tags>
+        <tag>诗词摘抄</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Kotlin常用的8种循环遍历方法</title>
+    <url>/2023/07/27/kt-loop/</url>
+    <content><![CDATA[<p>本篇文章整理一下Kotlin常用的循环遍历写法。</p>
+<span id="more"></span>
+<p>我们经常会使用以下方法进行遍历。</p>
+<pre><code>for(i in 0..args.size - 1) &#123;
+    println(args[i])
+&#125;
+</code></pre>
+<blockquote>
+<p>Tips: Koltin可以通过调用kotlin.ranges包中的<code>rangeTo()</code>函数及其操作符形式的<code>..</code>轻松的创建两个值的区间。通常<code>rangTo</code>会辅以<code>in</code>或者<code>!in</code>函数。整数类型区间（IntRange、LongRange、CharRange）还有一个拓展特性：可以对对其进行迭代。这些区间也是相应类型的等差数列。这种区间通常用于for循环中迭代。要反向迭代数字，使用<code>downTo</code>函数。也可以通过任意步长（不一定为1）迭代数字，通过<code>step</code>完成。 要迭代不包含其结束元素的数字区间（左闭右开区间），使用<code>until</code>函数。</p>
+</blockquote>
+<pre><code>for (i in 1..4) &#123; //等同于1 &lt;= i &amp;&amp; i &lt;= 4
+    print(i)
+&#125;
+
+for (i in 4 downTo 1) print(i) //输出结果：4321
+
+for (i in 1..8 step 2) print(i) //输出：1357
+
+for (i in 1 until 10) &#123; // i in [1, 10), 10被排除
+    print(i)
+&#125;
+</code></pre>
+<p>但是Array有一个可读性更强的扩展属性lastIndex。上边的循环可以写成这样：</p>
+<pre><code>for(i in 0..args.lastIndex) &#123;
+    println(args[i])
+&#125;
+</code></pre>
+<p>实际上我们不需要知道最后一个索引，有一个更简单的写法：</p>
+<pre><code>for(i in 0 until args.szie) &#123;
+    println(args[i])
+&#125;
+</code></pre>
+<p>当然也可以使用下标扩展属性indices得到他的范围，indices是一个IntRange类型的值：</p>
+<pre><code>for (i in args.indices) &#123;
+    println(args[i])
+&#125;
+</code></pre>
+<p>还有一个更加直接的写法，通过下边的方式直接迭代集合：</p>
+<pre><code>for (arg in args) &#123;
+    println(arg)
+&#125;
+</code></pre>
+<p>或者还可以使用<code>forEach</code>函数，传递一个lambda表达式来处理每个元素：</p>
+<pre><code>args.forEach &#123; arg -&gt;
+    println(arg)
+&#125;
+</code></pre>
+<p>在上边这些例子中，都增加一个索引变量，并在循环中通过索引获取元素。但是如果我们迭代的是List，最后两个例子底层使用iterator，而其他的例子仍是通过索引获取元素。最后的两个遍历方法：<br><code>withIndex</code>函数，他返回一个<code>Iterable</code>对象，该对象可以被解构为当前索引和元素:</p>
+<pre><code>for ((index,arg) in args.withIndex()) &#123;
+    println(&quot;$index: $arg&quot;)
+&#125;
+</code></pre>
+<p><code>forEachIndexed</code>函数，他为每个索引和参数提供了一个lambda表达式：</p>
+<pre><code>args.forEachIndexed &#123; index, arg -&gt;  
+    println(&quot;$index: $arg&quot;)
+&#125;
+</code></pre>
+]]></content>
+      <categories>
+        <category>Kotlin</category>
+      </categories>
+      <tags>
+        <tag>Kotlin</tag>
       </tags>
   </entry>
   <entry>
@@ -883,57 +1047,6 @@ $ git clone https://github.com/zsh-users/zsh-autosuggestions
       </tags>
   </entry>
   <entry>
-    <title>枚举单例</title>
-    <url>/2020/08/21/singleton/</url>
-    <content><![CDATA[<p>单例模式是应用最广泛的模式之一。在应用这个模式时，单例对象的类必须保证只有一个实例存在。</p>
-<span id="more"></span>
-
-<p>实现单例模式主要有以下几个关键点：<br>1.构造函数一般不对外开放，一般为private；<br>2.通过一个静态方法或者枚举返回单例类对象；<br>3.确保单例类的对象有且只有一个，尤其是在多线程环境下；<br>4.确保单例类对象在反序列化时不会重新构建对象。</p>
-<h2 id="常见的单例实现方式"><a href="#常见的单例实现方式" class="headerlink" title="常见的单例实现方式"></a>常见的单例实现方式</h2><p>常见的单例实现方式有懒汉模式、DCL、静态内部类单例模式。上述的几种单例模式实现中，在反序列化的情况下它们会出现重建对象。</p>
-<p>我们知道通过序列化可以将一个单例的对象的实例对象写到磁盘，然后再读回来，从而有效地获得一个实例。即使构造函数是私有的，反序列化时依然可以通过特殊的途径去创建类的一个新的实例，相当于调用该类的构造函数。反序列化提供了一个很特别的钩子函数，类中具有一个私有的<code>readResolve()</code>函数，这个函数可以让开发人员控制对象的反序列化。如果想杜绝单例对象在被反序列化时重新生成对象，那么必须加入<code>readResolve</code>函数。</p>
-<pre><code>public final class Singleton implements Serializable &#123;
-    private static final long serialVersionUID = 0L；
-    private static final Singleton INSTANCE = new Singleton();
-
-    private Singleton() &#123;
-    &#125;
-
-    public static Singleton getInstance() &#123;
-        return INSTANCE;
-    &#125;
-
-    private Object readResolve() throws ObjectStreamException &#123;
-        return INSTANCE;
-    &#125;
-&#125;
-</code></pre>
-<p>而对于枚举单例，不仅写法简单，最重要的是默认枚举实例的创建是线程安全的，并且在任何情况下他都是一个单例。<br>《Effective Java》在谈到枚举单例中写到：这种方法在功能上与公有域方法相近，但是它更加简洁，无偿提供了序列化机制，绝对防止多次实例化，即使是在面对复杂序列化或者反射攻击的时候。虽然这种方法还没有广泛采用，但是单元素的枚举类型已经成为实现Singleton的最佳方法。</p>
-<h3 id="枚举单例"><a href="#枚举单例" class="headerlink" title="枚举单例"></a>枚举单例</h3><p>枚举单例实现方式如下</p>
-<pre><code>public enum SingletonEnum &#123;
-    INSTANCE;
-    public void doSomething() &#123;
-
-    &#125;
-&#125;
-</code></pre>
-<p>那么枚举单例是怎样保证线程安全的呢？</p>
-<p>我们查看SingletonEnum.java文件编译后的字节码文件。如下：</p>
-<p><img src="singleton.png" alt="alt"></p>
-<p>可以看出，编译之后会生成一个继承自<code>java.lang.Enum</code>的<code>final class</code> SingletonEnum类，申明的枚举实例对应一个用<code>static final</code>修饰的变量，其初始化在静态块中完成。所以本质上线程安全也是通过类加载过程中，类构造器的调用实现了同步。</p>
-<p>又是如何保证反射安全呢？继续看代码</p>
-<p><img src="singleton1.png" alt="alt"></p>
-<p>原来在<code>java.lang.reflect.Constructor</code>类的<code>newInstance()</code>方法中进行了类型判断。如果是Enum类型，则会直接抛出异常。</p>
-<p>那么，序列化安全又是如何保证的呢？<br>通过阅读<code>ObjectOutputStream</code>类的<code>writeEnum()</code>方法和<code>ObjectInputStream</code>的<code>readEnum()</code>方法可知，序列化时，当为<code>Enum</code>类型时，只会把<code>Enum</code>类型中定义的<code>name</code><br>属性输出到结果中。反序列化时，就调用<code>Enum</code>的<code>T valueOf(Class&lt;T&gt; enumType, String name)</code>方法，根据<code>name</code>拿到Enum实例。</p>
-<p>同时，编译器是不允许任何对这种序列化进行定制，因此禁用了<code>writeObject、readObject、readObjectNoData</code>方法。并且<code>Enum</code>私有化了构造函数，且禁用了<code>clone()</code>方法，防止通过<code>new</code>和克隆创造对象。</p>
-]]></content>
-      <categories>
-        <category>设计模式</category>
-      </categories>
-      <tags>
-        <tag>单例</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Serializable 和 Parcelable</title>
     <url>/2023/07/08/serializable-parcelable/</url>
     <content><![CDATA[<p>什么是序列化？</p>
@@ -997,6 +1110,57 @@ $ git clone https://github.com/zsh-users/zsh-autosuggestions
       </categories>
       <tags>
         <tag>序列化</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>枚举单例</title>
+    <url>/2020/08/21/singleton/</url>
+    <content><![CDATA[<p>单例模式是应用最广泛的模式之一。在应用这个模式时，单例对象的类必须保证只有一个实例存在。</p>
+<span id="more"></span>
+
+<p>实现单例模式主要有以下几个关键点：<br>1.构造函数一般不对外开放，一般为private；<br>2.通过一个静态方法或者枚举返回单例类对象；<br>3.确保单例类的对象有且只有一个，尤其是在多线程环境下；<br>4.确保单例类对象在反序列化时不会重新构建对象。</p>
+<h2 id="常见的单例实现方式"><a href="#常见的单例实现方式" class="headerlink" title="常见的单例实现方式"></a>常见的单例实现方式</h2><p>常见的单例实现方式有懒汉模式、DCL、静态内部类单例模式。上述的几种单例模式实现中，在反序列化的情况下它们会出现重建对象。</p>
+<p>我们知道通过序列化可以将一个单例的对象的实例对象写到磁盘，然后再读回来，从而有效地获得一个实例。即使构造函数是私有的，反序列化时依然可以通过特殊的途径去创建类的一个新的实例，相当于调用该类的构造函数。反序列化提供了一个很特别的钩子函数，类中具有一个私有的<code>readResolve()</code>函数，这个函数可以让开发人员控制对象的反序列化。如果想杜绝单例对象在被反序列化时重新生成对象，那么必须加入<code>readResolve</code>函数。</p>
+<pre><code>public final class Singleton implements Serializable &#123;
+    private static final long serialVersionUID = 0L；
+    private static final Singleton INSTANCE = new Singleton();
+
+    private Singleton() &#123;
+    &#125;
+
+    public static Singleton getInstance() &#123;
+        return INSTANCE;
+    &#125;
+
+    private Object readResolve() throws ObjectStreamException &#123;
+        return INSTANCE;
+    &#125;
+&#125;
+</code></pre>
+<p>而对于枚举单例，不仅写法简单，最重要的是默认枚举实例的创建是线程安全的，并且在任何情况下他都是一个单例。<br>《Effective Java》在谈到枚举单例中写到：这种方法在功能上与公有域方法相近，但是它更加简洁，无偿提供了序列化机制，绝对防止多次实例化，即使是在面对复杂序列化或者反射攻击的时候。虽然这种方法还没有广泛采用，但是单元素的枚举类型已经成为实现Singleton的最佳方法。</p>
+<h3 id="枚举单例"><a href="#枚举单例" class="headerlink" title="枚举单例"></a>枚举单例</h3><p>枚举单例实现方式如下</p>
+<pre><code>public enum SingletonEnum &#123;
+    INSTANCE;
+    public void doSomething() &#123;
+
+    &#125;
+&#125;
+</code></pre>
+<p>那么枚举单例是怎样保证线程安全的呢？</p>
+<p>我们查看SingletonEnum.java文件编译后的字节码文件。如下：</p>
+<p><img src="singleton.png" alt="alt"></p>
+<p>可以看出，编译之后会生成一个继承自<code>java.lang.Enum</code>的<code>final class</code> SingletonEnum类，申明的枚举实例对应一个用<code>static final</code>修饰的变量，其初始化在静态块中完成。所以本质上线程安全也是通过类加载过程中，类构造器的调用实现了同步。</p>
+<p>又是如何保证反射安全呢？继续看代码</p>
+<p><img src="singleton1.png" alt="alt"></p>
+<p>原来在<code>java.lang.reflect.Constructor</code>类的<code>newInstance()</code>方法中进行了类型判断。如果是Enum类型，则会直接抛出异常。</p>
+<p>那么，序列化安全又是如何保证的呢？<br>通过阅读<code>ObjectOutputStream</code>类的<code>writeEnum()</code>方法和<code>ObjectInputStream</code>的<code>readEnum()</code>方法可知，序列化时，当为<code>Enum</code>类型时，只会把<code>Enum</code>类型中定义的<code>name</code><br>属性输出到结果中。反序列化时，就调用<code>Enum</code>的<code>T valueOf(Class&lt;T&gt; enumType, String name)</code>方法，根据<code>name</code>拿到Enum实例。</p>
+<p>同时，编译器是不允许任何对这种序列化进行定制，因此禁用了<code>writeObject、readObject、readObjectNoData</code>方法。并且<code>Enum</code>私有化了构造函数，且禁用了<code>clone()</code>方法，防止通过<code>new</code>和克隆创造对象。</p>
+]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>单例</tag>
       </tags>
   </entry>
   <entry>

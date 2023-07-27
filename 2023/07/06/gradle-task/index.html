@@ -30,8 +30,10 @@
 <meta property="og:description" content="Project的构建逻辑是一系列Task组成，每个Task负责完成一个基本工作。在配置阶段，Gradle会根据Task的依赖关系构造一个有向无环图，以便在执行阶段按照依赖关系执行Task。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://dengzhao7053.github.io/2023/07/06/gradle-task/task.png">
+<meta property="og:image" content="https://dengzhao7053.github.io/2023/07/06/gradle-task/task2.png">
+<meta property="og:image" content="https://dengzhao7053.github.io/2023/07/06/gradle-task/task1.png">
 <meta property="article:published_time" content="2023-07-06T15:11:24.000Z">
-<meta property="article:modified_time" content="2023-07-16T09:19:19.420Z">
+<meta property="article:modified_time" content="2023-07-26T16:12:16.244Z">
 <meta property="article:tag" content="Gradle">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://dengzhao7053.github.io/2023/07/06/gradle-task/task.png">
@@ -254,14 +256,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.5k</span>
+              <span>6.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>6 分钟</span>
             </span>
 
         </div>
@@ -441,6 +443,84 @@ MyTask.dependsOn(HelloTask, GreetTask)
 <li>mustRunAfter强制顺序：指定强制要求的任务执行属性；</li>
 <li>shouldRunAfter非强制顺序：指定非强制的任务执行顺序，在两种情况下会放弃此规则：1、改规则造成环形顺序；2、并行执行并且任务的所有依赖项都已经完成。</li>
 </ul>
+<h2 id="9-Gradle中的增量编译"><a href="#9-Gradle中的增量编译" class="headerlink" title="9.Gradle中的增量编译"></a>9.Gradle中的增量编译</h2><p>在我们使用的各种工具中，为了提升工作效率，总会使用到各种各样的缓存技术。在Gradle中这种以task组合起来的构建工具也不例外。在Gradle中，这种技术叫做增量构建。这一特性能够节省大量构建时间。例如编译过源文件后就不应该重复编译，除非发生了影响输出的更改（例如修改或删除源文件）；</p>
+<p>Gradle通过对比自从上一次构建之后，task的inputs和outputs是否变化，来决定是否跳过执行。如果相同，则Gradle认为task是最新的，从而会跳过执行。在Build Outputs中看到Task名称旁边出现<code>UP-TO-DATE</code>标志，就说明该Task是被跳过的。<br><img src="task2.png" alt="task2"><br>那么在定义Task的输入输出时，要遵循一个原则：如果Task的一个属性会影响输出，那么应该将该属性注册为输入，否则会影响Task执行；相反如果Task的一个属性不会影响输出，那么不应该将该属性注册为输入，否则Task会在不必要时执行。</p>
+<h3 id="输入和输出"><a href="#输入和输出" class="headerlink" title="输入和输出"></a>输入和输出</h3><p>为了实现增量构建，gradle将每一个task都分为三部分，分别是input输入、任务本身和output输出。下图是一个典型的Java编译的task。<br><img src="task1.png" alt="task1"><br>以上图为例，input就是目标JDK版本、源文件等，output就是编译出来的class文件。<br>增量构建的原理就是监听input的变化，只有input发生变化了，才重新执行task，否则gradle认为可以重用之前的执行结果。</p>
+<h3 id="自定义inputs和outputs"><a href="#自定义inputs和outputs" class="headerlink" title="自定义inputs和outputs"></a>自定义inputs和outputs</h3><p>既然task中的input和output在增量构建中这么重要，我们需要了解如何在task中定义input和output。<br>如果我们自定义一个task，那么满足下面两点就可以使用上增量编译了：</p>
+<ul>
+<li>需要为task中的inputs和outputs添加必要的getter方法；</li>
+<li>为getter方法添加对应的注解。</li>
+</ul>
+<p>Gradle支持三种主要的inputs和outputs类型：</p>
+<ul>
+<li><p>1.简单类型：简单类型就是所有实现了Serializable接口的类型，比如String和数值。</p>
+</li>
+<li><p>2.文件类型：文件类型就是File或者FileCollection的衍生类型，或者其他可以作为参数传递给Project.file(java.lang.Object)和Project.files(java.lang.Object…)的类型。</p>
+</li>
+<li><p>3.嵌套类型：有些自定义类型，本身不属于前面的1和2两种类型，但是它内部含有嵌套的inputs和outputs属性，这样的类型叫做嵌套类型。<br>举个例子，如下：</p>
+<pre><code>public class ProcessTemplates extends DefaultTask &#123;
+  private TemplateEngineType templateEngine;
+  private FileCollection sourceFiles;
+  private TemplateData templateData;
+  private File outputDir;
+
+  @Input
+  public TemplateEngineType getTemplateEngine() &#123;
+      return this.templateEngine;
+  &#125;
+
+  @InputFiles
+  public FileCollection getSourceFiles() &#123;
+      return this.sourceFiles;
+  &#125;
+
+  @Nested
+  public TemplateData getTemplateData() &#123;
+      return this.templateData;
+  &#125;
+
+  @OutputDirectory
+  public File getOutputDir() &#123; return this.outputDir; &#125;
+
+  // 上面四个属性的setter方法
+
+  @TaskAction
+  public void processTemplates() &#123;
+      // ...
+  &#125;
+&#125;
+</code></pre>
+<p>上边的例子，我们定义了4个属性，分别为TemplateEngineType，FileCollection，TemplateData和File。前面三个属性是输入，后面一个属性是输出。<br>除了getter和setter方法之外，我们还需要在getter方法中添加相应的注解：<code>@Input 、@InputFiles 、@Nested 和 @OutputDirectory，</code>除此之外，我们还定义了一个 @TaskAction 表示这个task要做的工作。<br>这里的TemplateEngineType是一个枚举类，因为enum默认是实现Serializable的，所以这里可以作为@Input使用。<br>sourceFiles使用的是FileCollection，表示的是一系列文件的集合，所以可以使用@InputFiles。<br>为什么TemplateData是@Nested类型的呢？我们看下它的实现：</p>
+<pre><code>public class TemplateData &#123;
+  private String name;
+  private Map&lt;String, String&gt; variables;
+
+  public TemplateData(String name, Map&lt;String, String&gt; variables) &#123;
+      this.name = name;
+      this.variables = new HashMap&lt;&gt;(variables);
+  &#125;
+
+  @Input
+  public String getName() &#123; return this.name; &#125;
+
+  @Input
+  public Map&lt;String, String&gt; getVariables() &#123;
+      return this.variables;
+  &#125;
+&#125;
+</code></pre>
+<p>可以看到虽然TemplateData本身并不是File或者简单类型，但是它内部的属性是简单类型的，所以TemplateData本身可以看做是@Nested的。<br>使用了这些注解之后，gradle在构建的时候就会检测和上一次构建相比，这些属性有没有发送变化，如果没有发送变化，那么gradle将会直接使用上一次构建生成的缓存。</p>
+</li>
+</ul>
+<p>除了上述的4个注解，Gradle还提供其他几个注解，常用的注解如下：</p>
+<ul>
+<li>@InputFile：相当于File，表示单个input文件。</li>
+<li>@InputDirectory：相当于File，表示单个input目录。</li>
+<li>@OutputFile：相当于File，表示输出文件。</li>
+<li>@OutputFiles：相当于Map&lt;String, File&gt; 或者 Iterable<File>，表示输出文件。</li>
+<li>@OutputDirectories：相当于Map&lt;String, File&gt; 或者 Iterable<File>，表示输出文件。</li>
+<li>@Internal：内部属性，不是input也不是output。</li>
+</ul>
 
     </div>
 
@@ -525,7 +605,7 @@ MyTask.dependsOn(HelloTask, GreetTask)
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%88%9B%E5%BB%BA%E7%AE%80%E5%8D%95Task"><span class="nav-number">1.</span> <span class="nav-text">1.创建简单Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%87%AA%E5%AE%9A%E4%B9%89Task"><span class="nav-number">2.</span> <span class="nav-text">2.自定义Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E8%8E%B7%E5%8F%96%E5%B7%B2%E5%88%9B%E5%BB%BA%E7%9A%84Task"><span class="nav-number">3.</span> <span class="nav-text">3.获取已创建的Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%BE%E7%BD%AETask%E5%B1%9E%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text">4.设置Task属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%89%A7%E8%A1%8CTask"><span class="nav-number">5.</span> <span class="nav-text">5.执行Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Task-Action%E5%8A%A8%E4%BD%9C"><span class="nav-number">6.</span> <span class="nav-text">6.Task Action动作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E8%B7%B3%E8%BF%87Task%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-number">7.</span> <span class="nav-text">7.跳过Task的执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-Task%E4%BE%9D%E8%B5%96%E5%85%B3%E7%B3%BB"><span class="nav-number">8.</span> <span class="nav-text">8.Task依赖关系</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%88%9B%E5%BB%BA%E7%AE%80%E5%8D%95Task"><span class="nav-number">1.</span> <span class="nav-text">1.创建简单Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%87%AA%E5%AE%9A%E4%B9%89Task"><span class="nav-number">2.</span> <span class="nav-text">2.自定义Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E8%8E%B7%E5%8F%96%E5%B7%B2%E5%88%9B%E5%BB%BA%E7%9A%84Task"><span class="nav-number">3.</span> <span class="nav-text">3.获取已创建的Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%BE%E7%BD%AETask%E5%B1%9E%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text">4.设置Task属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%89%A7%E8%A1%8CTask"><span class="nav-number">5.</span> <span class="nav-text">5.执行Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Task-Action%E5%8A%A8%E4%BD%9C"><span class="nav-number">6.</span> <span class="nav-text">6.Task Action动作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E8%B7%B3%E8%BF%87Task%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-number">7.</span> <span class="nav-text">7.跳过Task的执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-Task%E4%BE%9D%E8%B5%96%E5%85%B3%E7%B3%BB"><span class="nav-number">8.</span> <span class="nav-text">8.Task依赖关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-Gradle%E4%B8%AD%E7%9A%84%E5%A2%9E%E9%87%8F%E7%BC%96%E8%AF%91"><span class="nav-number">9.</span> <span class="nav-text">9.Gradle中的增量编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA"><span class="nav-number">9.1.</span> <span class="nav-text">输入和输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89inputs%E5%92%8Coutputs"><span class="nav-number">9.2.</span> <span class="nav-text">自定义inputs和outputs</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -541,20 +621,20 @@ MyTask.dependsOn(HelloTask, GreetTask)
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -598,12 +678,12 @@ MyTask.dependsOn(HelloTask, GreetTask)
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">37k</span>
+    <span title="站点总字数">41k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">34 分钟</span>
+    <span title="站点阅读时长">38 分钟</span>
 </div>
 
         
