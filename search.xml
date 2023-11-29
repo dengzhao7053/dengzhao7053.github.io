@@ -630,58 +630,6 @@ MyTask.dependsOn(HelloTask, GreetTask)
       </tags>
   </entry>
   <entry>
-    <title>Homebrew安装</title>
-    <url>/2022/07/18/homebrew/</url>
-    <content><![CDATA[<p><strong>Homebrew</strong>是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索、等很多实用的功能。简单的一条指令，就可以实现包管理。官网地址：<a href="https://brew.sh/">https://brew.sh</a></p>
-<span id="more"></span>
-
-<h2 id="Homebrew安装"><a href="#Homebrew安装" class="headerlink" title="Homebrew安装"></a>Homebrew安装</h2><p>1.打开终端<br>2.输入安装命令</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
-</code></pre>
-<p>由于国内某些网络原因，导致<code>http://raw.githubusercontent.com</code>无法访问，通常会提示以下错误：</p>
-<pre><code>Failed to connect to http://raw.githubusercontent.com port 443: Connection refused
-</code></pre>
-<p><strong>解决方法：</strong><br>使用国内代理安装，命令行如下：</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&quot;
-</code></pre>
-<p>卸载命令行如下：</p>
-<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&quot;
-</code></pre>
-<p>3.检查安装情况<br>执行命令行<code>brew --version</code>，显示Homebrew版本号则表示安装成功。</p>
-]]></content>
-      <tags>
-        <tag>develop tools</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java内存模型</title>
-    <url>/2020/04/01/jmm/</url>
-    <content><![CDATA[<p><code>Java Memory Model</code></p>
-<span id="more"></span>
-
-<p><code>Java</code>虚拟机规范中定义了<code>Java</code>内存模型<code>(Java Memory Model，JMM)</code>，用于屏蔽掉各种硬件和操作系统的内存访问差异，以实现让<code>Java</code>程序在各种平台下都能达到一致的并发效果。</p>
-<p><code>Java</code>内存模型规定了所有的变量都存储在主内存中(此处的主内存与介绍物理硬件时提到的主内存名字一样，两者也可以类比，但物理上它仅仅是虚拟机内存的一部分)。每条线程还有自己的工作内存(可与前面讲的处理器高速缓存类比)，线程的工作内存中保存该线程使用的变量的主内存副本，线程对变量的所有操作(读取、赋值等)都必须在工作内存中进行，而不能直接读写主内存中的数据。不同的线程之间也无法直接访问对方工作内存的变量，线程间变量值的传递均需要通过主内存来完成，线程、主内存、工作内存三者的交互关系如图：<br><img src="jmm.png" alt="关系"><br>这里所讲的主内存、工作内存与<code>Java</code>内存区域中的<code>Java</code>堆、栈、方法区等并不是同一个层次的堆内存的划分，这两者基本上是没有任何关系的。如果两者一定要勉强对应起来，那么从变量、主内存、工作内存的定义来看，主内存主要对应于<code>Java</code>堆中的对象实例数据部分，而工作内存则对应于虚拟机栈中的部分区域。从更基础的层次上说，主内存直接对应于物理硬件内存，而为了获取更好的运行速度，虚拟机(或者是硬件、操作系统本身的优化措施)可能会让工作内存优先存储于寄存器和高速缓存中，因为程序运行时主要访问的是工作内存。</p>
-<h3 id="内存间交互操作"><a href="#内存间交互操作" class="headerlink" title="内存间交互操作"></a>内存间交互操作</h3><p>关于主内存与工作内存之间具体的交互协议，即一个变量如何从主内存拷贝到工作内存、如何从工作内存同步回主内存这一类的实现细节，<code>Java</code>内存模型中定义了以下8种操作来完成。<code>Java</code>虚拟机实现时必须保证下面提及的每一种操作都是原子的、不可再分的。</p>
-<ul>
-<li><code>lock</code>(锁定)：作用于主内存的变量，它把一个变量标识为一条线程独占的状态。</li>
-<li><code>unlock</code>(解锁)：作用于主内存的变量，他把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</li>
-<li><code>read</code>(读取)：作用于主内存的变量，它把一个变量的值从主内存传输到线程的工作内存中，以便随后的<code>load</code>动作使用。</li>
-<li><code>load</code>(载入)：作用于工作内存的变量，它把<code>read</code>操作从主内存中得到的变量值放入工作内存的变量副本中。</li>
-<li><code>use</code>(使用)：作用于工作内存的变量，它把工作内存中一个变量的值传递给执行引擎，每当虚拟机遇到一个需要使用变量的值的字节码指令时将会执行这个操作。</li>
-<li><code>assign</code>(赋值)：作用于工作内存的变量，它把一个从执行引擎接收的值赋给工作内存的变量，每当虚拟机遇到一个给变量赋值的字节码指令是执行这个操作。</li>
-<li><code>store</code>(存储)：作用于工作内存的变量，它把工作内存中一个变量的值传送到主内存中，以便随后的<code>write</code>操作使用。</li>
-<li><code>write</code>(写入)：作用于主内存的变量，它把<code>store</code>操作从工作内存中得到的变量的值放入主内存的变量中。</li>
-</ul>
-<p>如果要把一个变量从主内存拷贝到工作内存，那就要按顺序执行<code>read</code>和<code>load</code>操作，如果要把变量从工作内存同步回主内存，就要按顺序执行<code>store</code>和<code>write</code>操作。注意，<code>Java</code>内存模型只要求上述两个操作必须按顺序执行，但不要求是连续执行。也就是说<code>read</code>和<code>load</code>之间、<code>store</code>与<code>write</code>之间是可以插入其他指令的。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>JMM</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Gradle学习（一）：初识Gradle</title>
     <url>/2022/08/29/gradle/</url>
     <content><![CDATA[<p><code>Gradle</code>是一套基于JVM的新一代自动化构建工具。早期，构建只有编译和打包的简单需求。但是现代软件开发的模式改变了，大多数项目都包含有多而杂的技术栈、混合的多种编程语言，并且使用多种测试策略。随着敏捷实践的崛起，构建不得不更早地支持代码集成，以及频繁和简单地交付软件到测试和产品环境。<code>Gradle</code>便是在这一背景下衍生出来的。</p>
@@ -854,6 +802,86 @@ gradle.addListener(new TaskActionListener() &#123;
       </tags>
   </entry>
   <entry>
+    <title>Homebrew安装</title>
+    <url>/2022/07/18/homebrew/</url>
+    <content><![CDATA[<p><strong>Homebrew</strong>是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索、等很多实用的功能。简单的一条指令，就可以实现包管理。官网地址：<a href="https://brew.sh/">https://brew.sh</a></p>
+<span id="more"></span>
+
+<h2 id="Homebrew安装"><a href="#Homebrew安装" class="headerlink" title="Homebrew安装"></a>Homebrew安装</h2><p>1.打开终端<br>2.输入安装命令</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
+</code></pre>
+<p>由于国内某些网络原因，导致<code>http://raw.githubusercontent.com</code>无法访问，通常会提示以下错误：</p>
+<pre><code>Failed to connect to http://raw.githubusercontent.com port 443: Connection refused
+</code></pre>
+<p><strong>解决方法：</strong><br>使用国内代理安装，命令行如下：</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&quot;
+</code></pre>
+<p>卸载命令行如下：</p>
+<pre><code>/bin/bash -c &quot;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&quot;
+</code></pre>
+<p>3.检查安装情况<br>执行命令行<code>brew --version</code>，显示Homebrew版本号则表示安装成功。</p>
+]]></content>
+      <tags>
+        <tag>develop tools</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java内存模型</title>
+    <url>/2020/04/01/jmm/</url>
+    <content><![CDATA[<p><code>Java Memory Model</code></p>
+<span id="more"></span>
+
+<p><code>Java</code>虚拟机规范中定义了<code>Java</code>内存模型<code>(Java Memory Model，JMM)</code>，用于屏蔽掉各种硬件和操作系统的内存访问差异，以实现让<code>Java</code>程序在各种平台下都能达到一致的并发效果。</p>
+<p><code>Java</code>内存模型规定了所有的变量都存储在主内存中(此处的主内存与介绍物理硬件时提到的主内存名字一样，两者也可以类比，但物理上它仅仅是虚拟机内存的一部分)。每条线程还有自己的工作内存(可与前面讲的处理器高速缓存类比)，线程的工作内存中保存该线程使用的变量的主内存副本，线程对变量的所有操作(读取、赋值等)都必须在工作内存中进行，而不能直接读写主内存中的数据。不同的线程之间也无法直接访问对方工作内存的变量，线程间变量值的传递均需要通过主内存来完成，线程、主内存、工作内存三者的交互关系如图：<br><img src="jmm.png" alt="关系"><br>这里所讲的主内存、工作内存与<code>Java</code>内存区域中的<code>Java</code>堆、栈、方法区等并不是同一个层次的堆内存的划分，这两者基本上是没有任何关系的。如果两者一定要勉强对应起来，那么从变量、主内存、工作内存的定义来看，主内存主要对应于<code>Java</code>堆中的对象实例数据部分，而工作内存则对应于虚拟机栈中的部分区域。从更基础的层次上说，主内存直接对应于物理硬件内存，而为了获取更好的运行速度，虚拟机(或者是硬件、操作系统本身的优化措施)可能会让工作内存优先存储于寄存器和高速缓存中，因为程序运行时主要访问的是工作内存。</p>
+<h3 id="内存间交互操作"><a href="#内存间交互操作" class="headerlink" title="内存间交互操作"></a>内存间交互操作</h3><p>关于主内存与工作内存之间具体的交互协议，即一个变量如何从主内存拷贝到工作内存、如何从工作内存同步回主内存这一类的实现细节，<code>Java</code>内存模型中定义了以下8种操作来完成。<code>Java</code>虚拟机实现时必须保证下面提及的每一种操作都是原子的、不可再分的。</p>
+<ul>
+<li><code>lock</code>(锁定)：作用于主内存的变量，它把一个变量标识为一条线程独占的状态。</li>
+<li><code>unlock</code>(解锁)：作用于主内存的变量，他把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</li>
+<li><code>read</code>(读取)：作用于主内存的变量，它把一个变量的值从主内存传输到线程的工作内存中，以便随后的<code>load</code>动作使用。</li>
+<li><code>load</code>(载入)：作用于工作内存的变量，它把<code>read</code>操作从主内存中得到的变量值放入工作内存的变量副本中。</li>
+<li><code>use</code>(使用)：作用于工作内存的变量，它把工作内存中一个变量的值传递给执行引擎，每当虚拟机遇到一个需要使用变量的值的字节码指令时将会执行这个操作。</li>
+<li><code>assign</code>(赋值)：作用于工作内存的变量，它把一个从执行引擎接收的值赋给工作内存的变量，每当虚拟机遇到一个给变量赋值的字节码指令是执行这个操作。</li>
+<li><code>store</code>(存储)：作用于工作内存的变量，它把工作内存中一个变量的值传送到主内存中，以便随后的<code>write</code>操作使用。</li>
+<li><code>write</code>(写入)：作用于主内存的变量，它把<code>store</code>操作从工作内存中得到的变量的值放入主内存的变量中。</li>
+</ul>
+<p>如果要把一个变量从主内存拷贝到工作内存，那就要按顺序执行<code>read</code>和<code>load</code>操作，如果要把变量从工作内存同步回主内存，就要按顺序执行<code>store</code>和<code>write</code>操作。注意，<code>Java</code>内存模型只要求上述两个操作必须按顺序执行，但不要求是连续执行。也就是说<code>read</code>和<code>load</code>之间、<code>store</code>与<code>write</code>之间是可以插入其他指令的。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>JMM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>运行时栈帧</title>
+    <url>/2023/11/28/jvm-runtime-data-areas/</url>
+    <content><![CDATA[<p><img src="jvm-architecture.png" alt="jvm-architecture"></p>
+<span id="more"></span>
+
+<p>Java虚拟机以方法作为最基本的执行单元，“栈帧”(Stack Frame)则是用于支持虚拟机进行方法调用和方法执行背后的数据结构，它也是虚拟机栈(Virtual Machine Stack)的栈元素。栈帧存储了方法的局部变量表、操作数栈、动态连接和方法返回地址等信息。每一个方法从调用开始至执行结束的过程，都对应着一个栈帧在虚拟机栈里边从入栈到出栈的过程。</p>
+<p>每个栈帧都包括了局部变量表、操作数栈、动态连接、方法返回地址和一些额外的附加信息。栈帧中需要多大的局部变量表、需要多深的操作数栈就已经被分析计算出来，并且写入到方发表的Code属性中。换言之，一个栈帧需要分配多少内存，并不会受到程序运行期变量数据的影响，而仅仅取决于程序源码和具体的虚拟机实现的栈内存布局形式。</p>
+<p>一个线程中的方法调用链可能会很长，对于执行引擎来讲，在活动线程中，只有位于栈顶的方法才是在运行的，只有位于栈顶的栈帧才是生效的，其被称为“当前栈帧”(Current Stack Frame)，与这个栈帧所关联的方法别称为“当前方法”(Current Method)。执行引擎所运行的所有字节码指令都只针对当前栈帧进行操作。</p>
+<p>典型的栈帧结构如下：<br><img src="stack-frame.png" alt="栈帧的概念结构"></p>
+<p>本文只会详细了解栈帧中的局部变量表和操作数栈的作用和数据结构。</p>
+<h2 id="1-局部变量表"><a href="#1-局部变量表" class="headerlink" title="1 局部变量表"></a>1 局部变量表</h2><p>局部变量表(Local Variables Table)是一组变量值的存储空间，用于存储方法参数和方法内部定义的局部变量。在Java程序被编译成Class文件时，就在方法的Code属性的max_locals数据项中确定了该方法所需要分配的局部变量表的最大容量。</p>
+<p>局部变量表的容量以变量槽(Variable Slot)为最小单位。一个变量槽可以存放一个32位以内的数据类型，Java中占用不超过32位存储空间的数据类型有boolean、byte、char、short、int、float、reference(对象实例的引用)和returnAddress(很少见忽略)这8种类型。对于64位的数据类型，Java虚拟机会以高位对齐的方式为其分配两个连续的变量槽空间。Java语言中明确的64位数据类型只有long和double两种。</p>
+<p>Java虚拟机通过索引的方式使用局部变量表，索引值的范围从0开始至局部变量表最大的变量槽数量。如果访问的是32位数据类型的变量，索引N就代表了使用第N个变量槽，如果访问的是64位数据类型的变量，则会同时使用第N和N+1两个变量槽。对于共同存放一个64位数据的两个变量槽，虚拟机不允许采用任何方式单独访问其中的某一个。</p>
+<p>当一个方法被调用时，Java虚拟机会使用局部变量表来完成参数值到参数变量列表的传递过程，即实参到形参的传递。<font color=red>如果执行的是实例方法(没有被static修饰的方法)，那局部变量表中第0位索引的变量槽默认是用于传递方法所属对象实例的引用，</font>在方法中可以通过”this”来访问到这个隐含的参数，其余参数则按照参数表顺序排列，占用从1开始的局部变量槽，参数表分配完毕后，再根据方法体内部的变量顺序和作用域分配其余的变量槽。</p>
+<p>为了尽可能节省栈帧耗用的内存空间，局部变量表中的变量槽是可以重用的，方法体中定义的变量，其作用域并不一定会覆盖整个方法体，如果当前字节码PC计数器的值已经超出了某个变量的作用域，那这个变量对应的变量槽就可以交给其他变量来重用。</p>
+<h2 id="2-操作数栈"><a href="#2-操作数栈" class="headerlink" title="2 操作数栈"></a>2 操作数栈</h2><p>操作数栈(Operand Stack)，它是一个后入先出(Last In First Out，LIFO)栈。同局部变量表一样，操作数栈的最大深度也在编译的时候被写入到Code属性的max_stacks数据项之中。操作数栈的每一个元素都可以是包括long和double在内的任意Java类型数据。32位数据类型所占的栈容量为1，64位数据所占的栈容量为2。</p>
+<p>当一个方法刚开始执行时，这个方法的操作数栈是空的，在方法的执行过程中，会有各种字节码指令往操作数栈中写入和提取内容，也就是出栈和入栈操作。譬如在做算数运算的时候是通过将运算涉及的操作数栈压入栈顶后调用运算指令来进行的，又譬如在调用其他方法的时候是通过操作数栈来进行方法参数的传递。举例：整数加法的字节码指令iadd，这条指令在运行的时候要求操作数栈中最接近栈顶的两个元素已经存入了两个int型的数值，当执行这个命令时，会把这两个int值出栈并相加，然后将相加的结果重新入栈。</p>
+<p>操作数栈中元素的数据类型必须与字节码指令的序列严格匹配。以上边的iadd指令为例，这个指令只能用于整型数的加法，它在执行时，最接近栈顶的两个元素的数据类型必须为整型。</p>
+<p>Java虚拟机的解释执行引擎被称为“基于栈的执行引擎”，里面的“栈”就是操作数栈。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>JMM</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Kotlin为什么将class设计成final类型</title>
     <url>/2021/01/02/kotlinclass/</url>
     <content><![CDATA[<p>“<code>Kotlin</code>开发人员为什么将类设计成<code>final</code>类型？”</p>
@@ -895,24 +923,6 @@ gradle.addListener(new TaskActionListener() &#123;
       <tags>
         <tag>Kotlin</tag>
         <tag>OOP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>相见欢·林花谢了春红</title>
-    <url>/2023/07/16/liyu-poem1/</url>
-    <content><![CDATA[<pre><code>相见欢·林花谢了春红
-李煜[五代]
-
-林花谢了春红，太匆匆。无奈朝来寒雨晚来风。
-
-胭脂泪，相留醉，几时重。自是人生长恨水长东。
-</code></pre>
-]]></content>
-      <categories>
-        <category>唐诗宋词</category>
-      </categories>
-      <tags>
-        <tag>诗词摘抄</tag>
       </tags>
   </entry>
   <entry>
@@ -981,6 +991,24 @@ for (i in 1 until 10) &#123; // i in [1, 10), 10被排除
       </categories>
       <tags>
         <tag>Kotlin</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>相见欢·林花谢了春红</title>
+    <url>/2023/07/16/liyu-poem1/</url>
+    <content><![CDATA[<pre><code>相见欢·林花谢了春红
+李煜[五代]
+
+林花谢了春红，太匆匆。无奈朝来寒雨晚来风。
+
+胭脂泪，相留醉，几时重。自是人生长恨水长东。
+</code></pre>
+]]></content>
+      <categories>
+        <category>唐诗宋词</category>
+      </categories>
+      <tags>
+        <tag>诗词摘抄</tag>
       </tags>
   </entry>
   <entry>
